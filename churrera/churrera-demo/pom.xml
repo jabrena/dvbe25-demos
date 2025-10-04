@@ -30,7 +30,7 @@
         <!-- Cursor Client dependency -->
         <dependency>
             <groupId>info.jab</groupId>
-            <artifactId>churrera-cursor-java-client</artifactId>
+            <artifactId>cursor-agent-api-java-client</artifactId>
             <version>0.1.0</version>
         </dependency>
 
