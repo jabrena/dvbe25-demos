@@ -14,4 +14,5 @@ and not touch the build system files like pom.xml
 
 if the verification is successful, then the goal is achieved
 and you can commit and push the changes to the branch to create the PR
+PR title need to be "Devoxx BE 2025 Hello World"
 and only commit java sources
