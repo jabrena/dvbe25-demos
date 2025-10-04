@@ -53,7 +53,7 @@
         <!-- OpenAPI specification dependency -->
         <dependency>
             <groupId>info.jab</groupId>
-            <artifactId>churrera-cursor-openapi</artifactId>
+            <artifactId>cursor-agent-api-openapi</artifactId>
             <version>0.1.0</version>
         </dependency>
 
@@ -164,30 +164,28 @@
                 </executions>
             </plugin>
 
-            <!-- Dependency plugin - Extract OpenAPI spec from dependency -->
+            <!-- Resources plugin - Copy OpenAPI spec from source module -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven-plugin-dependency.version}</version>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
-                        <id>unpack-openapi-spec</id>
+                        <id>copy-openapi-spec</id>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>info.jab</groupId>
-                                    <artifactId>churrera-cursor-openapi</artifactId>
-                                    <version>0.1.0</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/openapi-spec</outputDirectory>
-                                    <includes>openapi.yaml</includes>
-                                </artifactItem>
-                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/openapi-spec</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../cursor-agent-api-openapi/src/main/resources</directory>
+                                    <includes>
+                                        <include>openapi.yaml</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -216,7 +214,7 @@
                 <version>${maven-plugin-openapi-generator.version}</version>
                 <executions>
                     <execution>
-                        <phase>generate-sources</phase>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -257,7 +255,7 @@
                 <executions>
                     <execution>
                         <id>add-source</id>
-                        <phase>generate-sources</phase>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>add-source</goal>
                         </goals>
