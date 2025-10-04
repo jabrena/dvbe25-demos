@@ -22,6 +22,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <maven-plugin-compiler.version>3.14.0</maven-plugin-compiler.version>
+        <default.mainClass>info.jab.churrera.HelloWorldAgent</default.mainClass>
     </properties>
 
     <!-- Dependencies -->
@@ -29,7 +30,7 @@
         <!-- Cursor Client dependency -->
         <dependency>
             <groupId>info.jab</groupId>
-            <artifactId>churrera-cursor-java-client</artifactId>
+            <artifactId>cursor-agent-api-java-client</artifactId>
             <version>0.1.0</version>
         </dependency>
 
@@ -69,7 +70,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <mainClass>info.jab.churrera.HelloWorldAgent</mainClass>
+                    <mainClass>${exec.mainClass}</mainClass>
                     <workingDirectory>${project.parent.parent.basedir}</workingDirectory>
                     <systemProperties>
                         <systemProperty>
