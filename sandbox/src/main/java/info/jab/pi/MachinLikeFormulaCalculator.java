@@ -3,6 +3,8 @@ package info.jab.pi;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Implements Pi calculation using Machin-like Formula.
@@ -14,63 +16,82 @@ public class MachinLikeFormulaCalculator implements HighPrecisionPiCalculator {
     @Override
     public double calculatePi() {
         // Using Machin's formula: π/4 = 4 * arctan(1/5) - arctan(1/239)
-        double arctan1_5 = arctan(1.0 / 5.0);
-        double arctan1_239 = arctan(1.0 / 239.0);
+        final double arctan1_5 = calculateArctanSeries(1.0 / 5.0);
+        final double arctan1_239 = calculateArctanSeries(1.0 / 239.0);
         return 4.0 * (4.0 * arctan1_5 - arctan1_239);
     }
 
     @Override
     public BigDecimal calculatePiHighPrecision(int precision) {
-        MathContext mc = new MathContext(precision + 10, RoundingMode.HALF_UP);
+        final MathContext mc = new MathContext(precision + 10, RoundingMode.HALF_UP);
         
-        BigDecimal five = new BigDecimal("5", mc);
-        BigDecimal twoThirtyNine = new BigDecimal("239", mc);
-        BigDecimal four = new BigDecimal("4", mc);
+        final BigDecimal five = new BigDecimal("5", mc);
+        final BigDecimal twoThirtyNine = new BigDecimal("239", mc);
+        final BigDecimal four = new BigDecimal("4", mc);
         
-        BigDecimal arctan1_5 = arctanHighPrecision(BigDecimal.ONE.divide(five, mc), mc);
-        BigDecimal arctan1_239 = arctanHighPrecision(BigDecimal.ONE.divide(twoThirtyNine, mc), mc);
+        final Function<BigDecimal, BigDecimal> arctanCalculator = x -> 
+            calculateArctanHighPrecisionSeries(x, mc);
         
-        BigDecimal result = four.multiply(four.multiply(arctan1_5, mc).subtract(arctan1_239, mc), mc);
-        return result.setScale(precision, RoundingMode.HALF_UP);
+        final BigDecimal arctan1_5 = arctanCalculator.apply(BigDecimal.ONE.divide(five, mc));
+        final BigDecimal arctan1_239 = arctanCalculator.apply(BigDecimal.ONE.divide(twoThirtyNine, mc));
+        
+        return four.multiply(four.multiply(arctan1_5, mc).subtract(arctan1_239, mc), mc)
+                   .setScale(precision, RoundingMode.HALF_UP);
     }
 
     /**
-     * Calculates arctan using Taylor series expansion.
+     * Calculates arctan using Taylor series expansion in functional style.
      * arctan(x) = x - x³/3 + x⁵/5 - x⁷/7 + ...
      */
-    private double arctan(double x) {
-        double result = 0.0;
-        double term = x;
-        double xSquared = x * x;
-        int n = 1;
-        
-        while (Math.abs(term) > 1e-15) {
-            result += term / n;
-            term *= -xSquared;
-            n += 2;
-        }
-        
-        return result;
+    private double calculateArctanSeries(double x) {
+        return createTaylorSeriesStream(x)
+            .limit(1000) // Practical limit to avoid infinite stream
+            .takeWhile(term -> Math.abs(term) > 1e-15)
+            .mapToDouble(Double::doubleValue)
+            .sum();
     }
 
     /**
-     * High precision arctan calculation using Taylor series.
+     * Creates a stream of Taylor series terms for arctan calculation.
+     * Demonstrates functional composition and lazy evaluation.
      */
-    private BigDecimal arctanHighPrecision(BigDecimal x, MathContext mc) {
-        BigDecimal result = BigDecimal.ZERO;
-        BigDecimal term = x;
-        BigDecimal xSquared = x.multiply(x, mc);
-        BigDecimal minusXSquared = xSquared.negate();
-        int n = 1;
+    private Stream<Double> createTaylorSeriesStream(double x) {
+        final double xSquared = x * x;
         
-        BigDecimal epsilon = BigDecimal.ONE.divide(BigDecimal.TEN.pow(mc.getPrecision() - 5), mc);
-        
-        while (term.abs().compareTo(epsilon) > 0 && n < 1000) {
-            result = result.add(term.divide(new BigDecimal(n), mc), mc);
-            term = term.multiply(minusXSquared, mc);
-            n += 2;
-        }
-        
-        return result;
+        return Stream.iterate(
+            new TaylorTerm(x, 1),
+            term -> new TaylorTerm(term.value * (-xSquared), term.denominator + 2)
+        ).map(term -> term.value / term.denominator);
     }
+
+    /**
+     * High precision arctan calculation using functional Taylor series.
+     */
+    private BigDecimal calculateArctanHighPrecisionSeries(BigDecimal x, MathContext mc) {
+        final BigDecimal epsilon = BigDecimal.ONE.divide(BigDecimal.TEN.pow(mc.getPrecision() - 5), mc);
+        final BigDecimal xSquared = x.multiply(x, mc);
+        final BigDecimal minusXSquared = xSquared.negate();
+        
+        return Stream.iterate(
+            new HighPrecisionTaylorTerm(x, BigDecimal.ONE),
+            term -> new HighPrecisionTaylorTerm(
+                term.value.multiply(minusXSquared, mc),
+                term.denominator.add(new BigDecimal("2"))
+            )
+        )
+        .limit(1000) // Practical limit
+        .takeWhile(term -> term.value.abs().compareTo(epsilon) > 0)
+        .map(term -> term.value.divide(term.denominator, mc))
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    /**
+     * Immutable data structure for Taylor series terms (double precision).
+     */
+    private static record TaylorTerm(double value, int denominator) {}
+
+    /**
+     * Immutable data structure for high precision Taylor series terms.
+     */
+    private static record HighPrecisionTaylorTerm(BigDecimal value, BigDecimal denominator) {}
 }

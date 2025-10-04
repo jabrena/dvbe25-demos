@@ -3,6 +3,8 @@ package info.jab.pi;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.function.IntFunction;
+import java.util.stream.IntStream;
 
 /**
  * Implements Pi calculation using a Spigot Algorithm.
@@ -14,45 +16,49 @@ public class SpigotAlgorithmCalculator implements HighPrecisionPiCalculator {
     @Override
     public double calculatePi() {
         // Use Leibniz formula with reasonable convergence for double precision
-        double pi = 0.0;
-        int sign = 1;
-        
-        for (int i = 0; i < 1000000; i++) {
-            pi += sign / (2.0 * i + 1.0);
-            sign *= -1;
-        }
-        
-        return pi * 4.0;
+        return IntStream.range(0, 1_000_000)
+            .mapToDouble(this::calculateLeibnizTerm)
+            .sum() * 4.0;
     }
 
     @Override
     public BigDecimal calculatePiHighPrecision(int precision) {
-        // For high precision, we'll use the Leibniz formula with acceleration
         return calculatePiUsingLeibnizWithAcceleration(precision);
     }
 
     /**
+     * Pure function to calculate a single term in the Leibniz series.
+     */
+    private double calculateLeibnizTerm(int i) {
+        final double denominator = 2.0 * i + 1.0;
+        final double term = 1.0 / denominator;
+        return (i % 2 == 0) ? term : -term;
+    }
+
+    /**
      * Calculates π using accelerated Leibniz formula (π/4 = 1 - 1/3 + 1/5 - 1/7 + ...)
-     * with better convergence techniques.
+     * with better convergence techniques using functional approach.
      */
     private BigDecimal calculatePiUsingLeibnizWithAcceleration(int precision) {
-        MathContext mc = new MathContext(precision + 20, RoundingMode.HALF_UP);
+        final MathContext mc = new MathContext(precision + 20, RoundingMode.HALF_UP);
+        final int terms = precision * 500;
         
-        BigDecimal sum = BigDecimal.ZERO;
-        BigDecimal sign = BigDecimal.ONE;
-        BigDecimal four = new BigDecimal("4");
-        
-        // Use many more terms for higher precision
-        int terms = precision * 500;
-        
-        for (int n = 0; n < terms; n++) {
-            BigDecimal denominator = new BigDecimal(2 * n + 1);
-            BigDecimal term = sign.divide(denominator, mc);
-            sum = sum.add(term, mc);
-            sign = sign.negate();
-        }
-        
-        BigDecimal result = four.multiply(sum, mc);
-        return result.setScale(precision, RoundingMode.HALF_UP);
+        return IntStream.range(0, terms)
+            .mapToObj(createHighPrecisionTermCalculator(mc))
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            .multiply(new BigDecimal("4"), mc)
+            .setScale(precision, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Creates a function that calculates high precision terms for the Leibniz series.
+     * Demonstrates functional composition and immutable computation.
+     */
+    private IntFunction<BigDecimal> createHighPrecisionTermCalculator(MathContext mc) {
+        return n -> {
+            final BigDecimal denominator = new BigDecimal(2 * n + 1);
+            final BigDecimal term = BigDecimal.ONE.divide(denominator, mc);
+            return (n % 2 == 0) ? term : term.negate();
+        };
     }
 }
