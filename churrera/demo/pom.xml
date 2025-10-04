@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>info.jab.aoc</groupId>
+        <artifactId>churrera</artifactId>
+        <version>0.1.0</version>
+    </parent>
+
+    <artifactId>churrera-demo</artifactId>
+    <version>0.1.0</version>
+    <packaging>jar</packaging>
+
+    <!-- Properties -->
+    <properties>
+        <java.version>25</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <maven-plugin-compiler.version>3.14.0</maven-plugin-compiler.version>
+    </properties>
+
+    <!-- Dependencies -->
+    <dependencies>
+        <!-- Cursor Client dependency -->
+        <dependency>
+            <groupId>info.jab.aoc</groupId>
+            <artifactId>churrera-cursor-java-client</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+
+        <!-- PicoCLI dependency removed - now using simple main class -->
+
+        <!-- Dotenv for reading .env files -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- Build Configuration -->
+    <build>
+        <plugins>
+            <!-- Maven Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-plugin-compiler.version}</version>
+                <configuration>
+                    <release>${java.version}</release>
+                </configuration>
+            </plugin>
+            
+            <!-- Exec Maven Plugin for running the application -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <mainClass>info.jab.churrera.HelloWorldAgent</mainClass>
+                    <workingDirectory>${project.parent.parent.basedir}</workingDirectory>
+                    <systemProperties>
+                        <systemProperty>
+                            <key>user.dir</key>
+                            <value>${project.parent.parent.basedir}</value>
+                        </systemProperty>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,15 @@
+{
+    "id": "bc-96b29ed0-ee57-49f7-ae86-713da8bd4802",
+    "status": "CREATING",
+    "source": {
+        "repository": "https://github.com/jabrena/cursor-agents-aoc-demo",
+        "ref": "main"
+    },
+    "target": {
+        "autoCreatePr": true,
+        "branchName": "cursor/setup-java-25-and-hello-world-example-049e",
+        "url": "https://cursor.com/agents?id=bc-96b29ed0-ee57-49f7-ae86-713da8bd4802"
+    },
+    "name": "Setup java 25 and hello world example",
+    "createdAt": "2025-09-20T16:06:28.569Z"
+}
