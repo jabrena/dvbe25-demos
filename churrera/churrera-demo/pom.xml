@@ -22,6 +22,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <maven-plugin-compiler.version>3.14.0</maven-plugin-compiler.version>
+        <default.mainClass>info.jab.churrera.HelloWorldAgent</default.mainClass>
     </properties>
 
     <!-- Dependencies -->
@@ -69,7 +70,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <mainClass>info.jab.churrera.HelloWorldAgent</mainClass>
+                    <mainClass>${exec.mainClass}</mainClass>
                     <workingDirectory>${project.parent.parent.basedir}</workingDirectory>
                     <systemProperties>
                         <systemProperty>

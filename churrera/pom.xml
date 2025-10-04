@@ -17,8 +17,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>cursor-openapi</module>
-        <module>cursor-client</module>
-        <module>demo</module>
+        <module>cursor-agent-api-openapi</module>
+        <module>cursor-agent-api-java-client</module>
+        <module>churrera-demo</module>
     </modules>
 </project>

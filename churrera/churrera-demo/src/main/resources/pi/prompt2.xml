@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://jabrena.github.io/pml/schemas/0.1.0/pml.xsd">
+
+    <metadata>
+        <title>Pi Calculation in Cursor Backgroun Agent</title>
+    </metadata>
+
+    <role>You are a Senior software engineer with extensive experience in Java software development</role>
+
+    <goal>Calculate the value of Pi different approaches:
+
+1. Machin-like Formulas
+2. Chudnovsky Algorithm
+3. Bailey-Borwein-Plouffe (BBP) Formula
+4. Gauss-Legendre Algorithm
+5. Spigot Algorithms
+
+To implement the different alternatives,
+follow TDD and create a unique test class which will test all implementations using parameterized test.
+In the assert test agains the following cases:
+
+Assert against EXPECTED_PI with a standard delta
+
+private static final double EXPECTED_PI = Math.PI;
+private static final double STANDARD_DELTA = 0.0001;
+
+Assert against EXPECTED_PI_HIGH_PRECISION if the implementation supports it
+
+private static final String EXPECTED_PI_HIGH_PRECISION = "3.14159265358979323846264338327950288419716939937510";
+
+put the test class in the package info.jab.pi
+in the path sandbox/src/test/java/info/jab/pi
+
+After the test implemenation, build the project with `./mvnw clean package -pl sandbox`
+that test will fail because the implementation is not yet done.
+
+After this step, implement the different approaches
+in the package info.jab.pi in the path sandbox/src/main/java/info/jab/pi
+    </goal>
+
+    <safeguards>
+        <safeguards-list>
+            <safeguards-item>not compile individually the solution, use maven</safeguards-item>
+            <safeguards-item>verify the changes with `./mvnw clean package -pl sandbox`</safeguards-item>
+            <safeguards-item>if the verification is successful, then the goal is achieved</safeguards-item>
+            <safeguards-item>and commit java sources only and push the changes to the branch to create the PR</safeguards-item>
+        </safeguards-list>
+    </safeguards>
+
+</prompt>
