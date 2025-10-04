@@ -19,7 +19,7 @@
     <properties>
         <java.version>25</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <openapi-generator-maven-plugin.version>7.15.0</openapi-generator-maven-plugin.version>
+        <openapi-generator-maven-plugin.version>7.16.0</openapi-generator-maven-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <swagger-ui.version>5.28.1</swagger-ui.version>
         <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
