@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>info.jab</groupId>
+        <artifactId>churrera</artifactId>
+        <version>0.1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!-- Project Coordinates -->
+    <groupId>info.jab</groupId>
+    <artifactId>churrera-cursor-java-client</artifactId>
+    <version>0.1.0</version>
+    <packaging>jar</packaging>
+
+    <!-- Properties -->
+    <properties>
+        <!-- Core build properties -->
+        <java.version>25</java.version>
+        <maven.version>3.9.6</maven.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Dependency versions -->
+        <jackson-core.version>2.20.0</jackson-core.version>
+        <jackson-annotations.version>2.20</jackson-annotations.version>
+        <swagger.version>2.2.36</swagger.version>
+        <jakarta.annotation.version>3.0.0</jakarta.annotation.version>
+
+        <!-- Test dependency versions -->
+        <junit.version>5.10.1</junit.version>
+        <wiremock.version>3.13.1</wiremock.version>
+        <assertj.version>3.27.4</assertj.version>
+
+        <!-- Maven plugin versions -->
+        <maven-plugin-openapi-generator.version>7.15.0</maven-plugin-openapi-generator.version>
+        <maven-plugin-compiler.version>3.14.0</maven-plugin-compiler.version>
+        <maven-plugin-dependency.version>3.8.1</maven-plugin-dependency.version>
+        <maven-plugin-build-helper.version>3.6.1</maven-plugin-build-helper.version>
+        <maven-plugin-surefire.version>3.5.4</maven-plugin-surefire.version>
+        <maven-plugin-failsafe.version>3.5.4</maven-plugin-failsafe.version>
+        <maven-plugin-enforcer.version>3.6.1</maven-plugin-enforcer.version>
+        <extra-enforcer-rules.version>1.10.0</extra-enforcer-rules.version>
+        <maven-plugin-versions.version>2.19.1</maven-plugin-versions.version>
+    </properties>
+
+    <!-- Dependencies -->
+    <dependencies>
+        <!-- OpenAPI specification dependency -->
+        <dependency>
+            <groupId>info.jab</groupId>
+            <artifactId>churrera-cursor-openapi</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+
+        <!-- Jackson JSON processing dependencies -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <!-- Version managed by parent -->
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <!-- Version managed by parent -->
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <!-- Version managed by parent -->
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <!-- Version managed by parent -->
+        </dependency>
+
+        <!-- API documentation and annotation dependencies -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <!-- Version managed by parent -->
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <!-- Version managed by parent -->
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <!-- Version and scope managed by parent -->
+        </dependency>
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock</artifactId>
+            <!-- Version and scope managed by parent -->
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+            <!-- Version managed by parent -->
+        </dependency>
+    </dependencies>
+
+    <!-- Build Configuration -->
+    <build>
+        <plugins>
+            <!-- Core Maven plugins -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-plugin-compiler.version}</version>
+                <configuration>
+                    <release>${java.version}</release>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Enforcer Plugin - Enforce dependency convergence and project standards -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven-plugin-enforcer.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>extra-enforcer-rules</artifactId>
+                        <version>${extra-enforcer-rules.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>enforce</id>
+                        <configuration>
+                            <rules>
+                                <banCircularDependencies/>
+                                <dependencyConvergence />
+                                <banDuplicatePomDependencyVersions />
+                                <requireMavenVersion>
+                                    <version>${maven.version}</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>${java.version}</version>
+                                </requireJavaVersion>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>org.projectlombok:lombok</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Dependency plugin - Extract OpenAPI spec from dependency -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-plugin-dependency.version}</version>
+                <executions>
+                    <execution>
+                        <id>unpack-openapi-spec</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>info.jab</groupId>
+                                    <artifactId>churrera-cursor-openapi</artifactId>
+                                    <version>0.1.0</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/openapi-spec</outputDirectory>
+                                    <includes>openapi.yaml</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Code generation plugin - Generate Java client from OpenAPI spec
+
+                 The .openapi-generator-ignore file allows you to control which files are generated:
+                 - Place patterns in .openapi-generator-ignore to skip file generation
+                 - Use .gitignore syntax (*, **, #comments, !negation)
+                 - Common use cases:
+                   * Skip README.md to maintain custom documentation
+                   * Skip pom.xml to avoid overwriting build configuration
+                   * Skip specific API/model classes you want to customize
+                   * Skip test files to write your own tests
+
+                 Example patterns:
+                   README.md           # Skip all README files
+                   src/test/java/**    # Skip all test files
+                   **/model/User.java  # Skip User model in any package
+                   !**/api/UserApi.java # Force generate UserApi (negation)
+            -->
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${maven-plugin-openapi-generator.version}</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.build.directory}/openapi-spec/openapi.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <library>native</library>
+                            <output>${project.build.directory}/generated-sources</output>
+                            <apiPackage>info.jab.cursor.client.api</apiPackage>
+                            <modelPackage>info.jab.cursor.client.model</modelPackage>
+                            <invokerPackage>info.jab.cursor.client</invokerPackage>
+                            <!--
+                                .openapi-generator-ignore file controls which files are generated/overwritten
+                                Place this file in the project root or specify path with ignoreFileOverride
+                            <ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
+                            -->
+
+                            <configOptions>
+                                <dateLibrary>java8</dateLibrary>
+                                <java8>true</java8>
+                                <performBeanValidation>false</performBeanValidation>
+                                <useBeanValidation>false</useBeanValidation>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <openApiNullable>false</openApiNullable>
+                                <useNullableForMandatory>false</useNullableForMandatory>
+                                <useJakartaEe>true</useJakartaEe>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Build helper plugin - Add generated sources to build path -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${maven-plugin-build-helper.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Test execution plugins -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-plugin-surefire.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-plugin-failsafe.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${maven-plugin-versions.version}</version>
+                <configuration>
+                    <allowSnapshots>false</allowSnapshots>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
