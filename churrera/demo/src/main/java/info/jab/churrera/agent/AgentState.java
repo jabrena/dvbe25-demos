@@ -1,4 +1,4 @@
-package info.jab.churrera;
+package info.jab.churrera.agent;
 
 import info.jab.cursor.client.model.Agent;
 

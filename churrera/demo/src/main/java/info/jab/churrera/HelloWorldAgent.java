@@ -1,18 +1,19 @@
 package info.jab.churrera;
 
 import info.jab.cursor.CursorAgent;
-import static info.jab.churrera.AgentOperation.LAUNCH;
-import static info.jab.churrera.AgentOperation.UPDATE;
-import info.jab.churrera.utils.ApiKeyResolver;
+import info.jab.churrera.util.ApiKeyResolver;
+import info.jab.churrera.agent.BaseAgent;
+import static info.jab.churrera.util.PmlConverter.toMarkdown;
+import static info.jab.churrera.util.ClasspathResolver.retrieve;
 
 public class HelloWorldAgent extends BaseAgent {
 
     public static void main(String[] args) throws Exception {
 
-        //Define the parameters
+        //Agent configuration
         String model =  "claude-4-sonnet";
         String repository = "https://github.com/jabrena/dvbe25-demos";
-        Integer delaySeconds = 30; // Parse delay from command-line args or use default
+        Integer delaySeconds = 30;
         String apiKey = ApiKeyResolver.resolveApiKey();
 
         //Instantiate the Agent
@@ -28,14 +29,13 @@ public class HelloWorldAgent extends BaseAgent {
         startTime = System.currentTimeMillis();
 
         // Launch initial agent
-        var agent = executeAgentOperation(LAUNCH, "hello-world/prompt1.md", null);
+        var agent = launchAgent(toMarkdown("hello-world/prompt1.xml"));
 
         // Add new prompt using the agent ID from the previous operation
-        agent = executeAgentOperation(UPDATE, "hello-world/prompt2.md", agent.getId());
-
+        agent = updateAgent(toMarkdown("hello-world/prompt2.xml"), agent.getId());
 
         // Add new prompt using the agent ID from the previous operation
-        agent = executeAgentOperation(UPDATE, "hello-world/prompt3.md", agent.getId());
+        agent = updateAgent(retrieve("hello-world/prompt3.md"), agent.getId());
 
         // Show review message
         showCompletionMessage(agent);

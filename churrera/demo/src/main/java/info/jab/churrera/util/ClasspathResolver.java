@@ -1,4 +1,4 @@
-package info.jab.churrera.utils;
+package info.jab.churrera.util;
 
 import java.nio.charset.StandardCharsets;
 
@@ -8,12 +8,12 @@ import java.nio.charset.StandardCharsets;
  * This class provides methods to load prompt content from text files
  * located in the classpath resources directory.
  */
-public final class PromptResolver {
+public final class ClasspathResolver {
 
     /**
      * Private constructor to prevent instantiation of utility class.
      */
-    private PromptResolver() {
+    private ClasspathResolver() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 

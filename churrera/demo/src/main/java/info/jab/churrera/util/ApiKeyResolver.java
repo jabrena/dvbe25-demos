@@ -1,4 +1,4 @@
-package info.jab.churrera.utils;
+package info.jab.churrera.util;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Optional;
@@ -40,7 +40,7 @@ public final class ApiKeyResolver {
      */
     private static Optional<String> resolveFromEnvFile() {
         try {
-            
+
             try {
                 Dotenv dotenv = Dotenv.configure()
                     .directory(".")
@@ -57,7 +57,7 @@ public final class ApiKeyResolver {
                 // Continue to next path
                 return Optional.empty();
             }
-            
+
             return Optional.empty();
         } catch (Exception e) {
             System.err.println("⚠️  Could not read .env file: " + e.getMessage());
