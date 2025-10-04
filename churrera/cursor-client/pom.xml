@@ -52,7 +52,7 @@
     <dependencies>
         <!-- OpenAPI specification dependency -->
         <dependency>
-            <groupId>info.jab.aoc</groupId>
+            <groupId>info.jab</groupId>
             <artifactId>churrera-cursor-openapi</artifactId>
             <version>0.1.0</version>
         </dependency>
@@ -179,7 +179,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>info.jab.aoc</groupId>
+                                    <groupId>info.jab</groupId>
                                     <artifactId>churrera-cursor-openapi</artifactId>
                                     <version>0.1.0</version>
                                     <type>jar</type>

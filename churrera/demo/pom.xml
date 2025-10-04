@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>info.jab.aoc</groupId>
+        <groupId>info.jab</groupId>
         <artifactId>churrera</artifactId>
         <version>0.1.0</version>
     </parent>
@@ -28,7 +28,7 @@
     <dependencies>
         <!-- Cursor Client dependency -->
         <dependency>
-            <groupId>info.jab.aoc</groupId>
+            <groupId>info.jab</groupId>
             <artifactId>churrera-cursor-java-client</artifactId>
             <version>0.1.0</version>
         </dependency>
@@ -62,7 +62,7 @@
                     <release>${java.version}</release>
                 </configuration>
             </plugin>
-            
+
             <!-- Exec Maven Plugin for running the application -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
