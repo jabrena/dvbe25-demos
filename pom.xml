@@ -34,7 +34,7 @@
         <gherkin.version>35.1.0</gherkin.version>
 
         <!-- Testing dependencies -->
-        <junit-jupiter.version>5.13.4</junit-jupiter.version>
+        <junit-jupiter.version>6.0.0</junit-jupiter.version>
         <assertj-core.version>3.26.3</assertj-core.version>
 
         <!-- Additional dependencies for churrera modules -->
