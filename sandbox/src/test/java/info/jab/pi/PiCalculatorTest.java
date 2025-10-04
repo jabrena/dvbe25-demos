@@ -1,5 +1,7 @@
 package info.jab.pi;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -7,16 +9,17 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.*;
 
 /**
- * Parameterized test for different Pi calculation implementations.
- * Tests all approaches with a reasonable delta for floating-point comparison.
+ * Comprehensive test suite for Pi calculation implementations.
+ * Tests all approaches with appropriate precision expectations using different algorithms.
  */
-public class PiCalculatorTest {
+@DisplayName("Pi Calculator Tests")
+class PiCalculatorTest {
 
     private static final double EXPECTED_PI = Math.PI;
-    private static final double DELTA = 0.0001; // Reasonable delta for comparison
+    private static final double STANDARD_DELTA = 0.0001;
 
     /**
      * Provides test arguments for each Pi calculation implementation.
@@ -31,45 +34,68 @@ public class PiCalculatorTest {
         );
     }
 
-    /**
-     * Test each Pi calculation implementation with parameterized test.
-     * @param algorithmName Name of the algorithm for better test reporting
-     * @param calculator The Pi calculator implementation to test
-     */
-    @ParameterizedTest(name = "Pi calculation using {0}")
-    @MethodSource("piCalculatorProvider")
-    void testPiCalculation(String algorithmName, PiCalculator calculator) {
-        double calculatedPi = calculator.calculatePi();
-        assertEquals(EXPECTED_PI, calculatedPi, DELTA, 
-            "Pi calculation using " + algorithmName + " should be accurate within delta " + DELTA);
+    @Nested
+    @DisplayName("Standard Precision Pi Calculations")
+    class StandardPrecisionTests {
+
+        @ParameterizedTest(name = "Should calculate Pi accurately using {0}")
+        @DisplayName("Should calculate Pi with standard double precision")
+        @MethodSource("info.jab.pi.PiCalculatorTest#piCalculatorProvider")
+        void shouldCalculatePiWithStandardPrecision(String algorithmName, PiCalculator calculator) {
+            // Given
+            // Pi calculator implementation is provided via parameterized test
+
+            // When
+            double calculatedPi = calculator.calculatePi();
+
+            // Then
+            assertThat(calculatedPi)
+                .as("Pi calculation using %s should be accurate within delta %f", algorithmName, STANDARD_DELTA)
+                .isCloseTo(EXPECTED_PI, within(STANDARD_DELTA));
+        }
     }
 
-    /**
-     * Test each Pi calculation implementation with higher precision using BigDecimal.
-     * @param algorithmName Name of the algorithm for better test reporting
-     * @param calculator The Pi calculator implementation to test
-     */
-    @ParameterizedTest(name = "High precision Pi calculation using {0}")
-    @MethodSource("piCalculatorProvider")
-    void testHighPrecisionPiCalculation(String algorithmName, PiCalculator calculator) {
-        if (calculator instanceof HighPrecisionPiCalculator) {
-            HighPrecisionPiCalculator highPrecisionCalculator = (HighPrecisionPiCalculator) calculator;
-            BigDecimal calculatedPi = highPrecisionCalculator.calculatePiHighPrecision(50);
-            
-            // Convert expected Pi to BigDecimal with same precision for comparison
-            BigDecimal expectedPi = new BigDecimal("3.14159265358979323846264338327950288419716939937510");
-            
-            // Use different accuracy expectations based on algorithm efficiency
-            int decimalPlaces;
-            if (algorithmName.contains("Chudnovsky") || algorithmName.contains("Spigot")) {
-                decimalPlaces = 2; // More lenient for Leibniz-based implementations
-            } else {
-                decimalPlaces = 10; // Stricter for more efficient algorithms
+    @Nested
+    @DisplayName("High Precision Pi Calculations")
+    class HighPrecisionTests {
+
+        private static final int HIGH_PRECISION_SCALE = 50;
+        private static final String EXPECTED_PI_HIGH_PRECISION = "3.14159265358979323846264338327950288419716939937510";
+
+        @ParameterizedTest(name = "Should calculate Pi with high precision using {0}")
+        @DisplayName("Should calculate Pi with BigDecimal high precision")
+        @MethodSource("info.jab.pi.PiCalculatorTest#piCalculatorProvider")
+        void shouldCalculatePiWithHighPrecision(String algorithmName, PiCalculator calculator) {
+            // Given
+            // Skip test if calculator doesn't support high precision
+            if (!(calculator instanceof HighPrecisionPiCalculator)) {
+                return;
             }
             
-            assertEquals(expectedPi.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP), 
-                        calculatedPi.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP),
-                        "High precision Pi calculation using " + algorithmName + " should be accurate to " + decimalPlaces + " decimal places");
+            HighPrecisionPiCalculator highPrecisionCalculator = (HighPrecisionPiCalculator) calculator;
+            BigDecimal expectedPi = new BigDecimal(EXPECTED_PI_HIGH_PRECISION);
+            int expectedDecimalPlaces = determineExpectedPrecisionForAlgorithm(algorithmName);
+
+            // When
+            BigDecimal calculatedPi = highPrecisionCalculator.calculatePiHighPrecision(HIGH_PRECISION_SCALE);
+
+            // Then
+            BigDecimal expectedRounded = expectedPi.setScale(expectedDecimalPlaces, BigDecimal.ROUND_HALF_UP);
+            BigDecimal actualRounded = calculatedPi.setScale(expectedDecimalPlaces, BigDecimal.ROUND_HALF_UP);
+            
+            assertThat(actualRounded)
+                .as("High precision Pi calculation using %s should be accurate to %d decimal places", 
+                    algorithmName, expectedDecimalPlaces)
+                .isEqualTo(expectedRounded);
+        }
+
+        private int determineExpectedPrecisionForAlgorithm(String algorithmName) {
+            // Given different algorithms have different convergence characteristics
+            if (algorithmName.contains("Chudnovsky") || algorithmName.contains("Spigot")) {
+                return 2; // More lenient for Leibniz-based implementations
+            } else {
+                return 10; // Stricter for more efficient algorithms
+            }
         }
     }
 }
