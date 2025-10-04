@@ -2,6 +2,7 @@ package info.jab.churrera;
 
 import info.jab.cursor.CursorAgent;
 import info.jab.cursor.client.model.Agent;
+import info.jab.cursor.client.model.FollowUpResponse;
 import java.time.LocalTime;
 import static info.jab.churrera.AgentOperation.LAUNCH;
 import static info.jab.churrera.AgentOperation.UPDATE;
@@ -28,8 +29,10 @@ public abstract class BaseAgent {
         cursorAgent = new CursorAgent(apiKey);
     }
 
-    protected Agent executeAgentOperation(AgentOperation operation, String promptFile) throws Exception {
+
+    protected Agent executeAgentOperation(AgentOperation operation, String promptFile, String agentId) throws Exception {
         String prompt = PromptResolver.retrieve(promptFile);
+
         Agent resultAgent;
 
         switch (operation) {
@@ -37,6 +40,13 @@ public abstract class BaseAgent {
                 System.out.println("🚀 Launching cursor background agent...");
                 resultAgent = cursorAgent.launch(prompt, model, repository);
                 System.out.println("✅ Cursor background agent launched successfully!");
+                System.out.println("🔗 Agent Details: " + resultAgent.getTarget().getUrl());
+                break;
+
+            case UPDATE:
+                System.out.println("🚀 Adding new prompt...");
+                FollowUpResponse followUpResponse = cursorAgent.followUp(agentId, prompt);
+                resultAgent = cursorAgent.getStatus(followUpResponse.getId());
                 break;
 
             default:
@@ -48,6 +58,7 @@ public abstract class BaseAgent {
     }
 
     private void monitorAgentWithCustomLogic(Agent agent, CursorAgent cursorAgent, int delaySeconds) throws Exception {
+        System.out.println();
         System.out.println("🔄 Starting to monitor agent status...");
         System.out.println("📊 Checking status every " + delaySeconds + " seconds");
         System.out.println("⏹️  Press Ctrl+C to stop monitoring\n");
@@ -138,6 +149,42 @@ public abstract class BaseAgent {
         } else {
             return String.format("%ds", seconds);
         }
+    }
+
+    protected void showCompletionMessage(Agent finalAgent) {
+        System.out.println("\n🎉 Cursor background agent execution completed!");
+
+        Agent agentToUse = finalAgent;
+
+        if (agentToUse != null && agentToUse.getSource() != null && agentToUse.getSource().getRepository() != null) {
+            String repositoryUrl = agentToUse.getSource().getRepository().toString();
+            String prReviewUrl = generatePrReviewUrl(repositoryUrl);
+
+            System.out.println("🔍 Review the changes:");
+            System.out.println("   📋 Pull Requests: " + prReviewUrl);
+
+            if (agentToUse.getTarget() != null && agentToUse.getTarget().getUrl() != null) {
+                System.out.println("   🔗 Agent Details: " + agentToUse.getTarget().getUrl());
+            }
+        }
+
+        System.out.println("\n✨ Thank you for using Churrera!");
+    }
+
+    protected String generatePrReviewUrl(String repositoryUrl) {
+        if (repositoryUrl == null || repositoryUrl.trim().isEmpty()) {
+            return "Unable to generate PR URL";
+        }
+
+        // Remove trailing slashes
+        String cleanUrl = repositoryUrl.replaceAll("/+$", "");
+
+        // Add https:// if not already present
+        if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+            cleanUrl = "https://" + cleanUrl;
+        }
+
+        return cleanUrl + "/pulls";
     }
 
 }
