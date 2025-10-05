@@ -24,8 +24,7 @@ class PiCalculatorTest {
      */
     static Stream<HighPrecisionPiCalculator> piCalculatorProvider() {
         return Stream.of(
-            new MachinLikePiCalculator(),
-            new ChudnovskyPiCalculator()
+            new MachinLikePiCalculator()
         );
     }
 

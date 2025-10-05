@@ -36,6 +36,9 @@
         <!-- Testing dependencies -->
         <junit-jupiter.version>6.0.0</junit-jupiter.version>
         <assertj-core.version>3.26.3</assertj-core.version>
+        
+        <!-- JMH (Java Microbenchmark Harness) -->
+        <jmh.version>1.37</jmh.version>
 
         <!-- Additional dependencies for churrera modules -->
         <swagger.version>2.2.37</swagger.version>
@@ -116,6 +119,18 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj-core.version}</version>
+            </dependency>
+
+            <!-- JMH (Java Microbenchmark Harness) -->
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>${jmh.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-generator-annprocess</artifactId>
+                <version>${jmh.version}</version>
             </dependency>
 
             <!-- Additional dependencies for churrera modules -->
