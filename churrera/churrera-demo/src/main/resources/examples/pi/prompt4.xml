@@ -19,6 +19,12 @@
         Review that all Java sources use imports with single imports
     </goal>
 
+    <output-format>
+        <output-format-list>
+            <output-format-item>explain in brief way the refactoring steps and finally the concepts applied</output-format-item>
+        </output-format-list>
+    </output-format>
+
     <safeguards>
         <safeguards-list>
             <safeguards-item>verify the changes only with `./mvnw clean verify -pl sandbox`</safeguards-item>

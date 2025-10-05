@@ -20,6 +20,12 @@
         - Dont miss Display none and good test method naming
     </goal>
 
+    <output-format>
+        <output-format-list>
+            <output-format-item>not explain anything</output-format-item>
+        </output-format-list>
+    </output-format>
+
     <safeguards>
         <safeguards-list>
             <safeguards-item>verify the changes only with `./mvnw clean verify -pl sandbox`</safeguards-item>

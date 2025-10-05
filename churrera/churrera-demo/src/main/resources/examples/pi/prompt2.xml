@@ -82,6 +82,12 @@ in the package info.jab.pi in the path sandbox/src/main/java/info/jab/pi
 
     </goal>
 
+    <output-format>
+        <output-format-list>
+            <output-format-item>not explain anything</output-format-item>
+        </output-format-list>
+    </output-format>
+
     <safeguards>
         <safeguards-list>
             <safeguards-item>not compile individually the solution, use maven</safeguards-item>
