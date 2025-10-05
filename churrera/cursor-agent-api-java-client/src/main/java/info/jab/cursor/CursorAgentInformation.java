@@ -19,7 +19,6 @@ public interface CursorAgentInformation {
      * @param limit Maximum number of agents to return (optional, can be null)
      * @param cursor Pagination cursor for retrieving next page (optional, can be null)
      * @return AgentsList containing the list of agents
-     * @throws Exception if the operation fails
      */
     AgentsList getAgents(Integer limit, String cursor);
 
@@ -28,7 +27,6 @@ public interface CursorAgentInformation {
      *
      * @param agentId The ID of the agent to retrieve status for
      * @return Agent instance with current status information
-     * @throws Exception if the operation fails
      */
     Agent getStatus(String agentId);
 
@@ -37,7 +35,6 @@ public interface CursorAgentInformation {
      *
      * @param agentId The ID of the agent to retrieve conversation for
      * @return ConversationResponse containing the agent's conversation history
-     * @throws Exception if the operation fails
      */
     ConversationResponse getAgentConversation(String agentId);
 

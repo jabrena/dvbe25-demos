@@ -9,6 +9,7 @@ import info.jab.churrera.util.CursorApiKeyResolver;
 import info.jab.churrera.util.PropertyResolver;
 import info.jab.cursor.client.model.ConversationMessage;
 import java.util.stream.Collectors;
+import java.util.List;
 
 public abstract class BaseAgent {
 
@@ -28,6 +29,20 @@ public abstract class BaseAgent {
         this.model = PropertyResolver.getPropertyAs("application.properties", "model", String.class).get();
         this.repository = PropertyResolver.getPropertyAs("application.properties", "repository", String.class).get();
         this.delaySeconds = PropertyResolver.getPropertyAs("application.properties", "delay", Integer.class).get();
+
+        // Verify if the model is valid with the cursorAgent.getModels()
+        try {
+            var availableModels = cursorAgent.getModels();
+            if (availableModels == null || !availableModels.contains(model)) {
+                throw new RuntimeException("Model '" + model + "' is not available. Available models: " + availableModels);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to verify model '" + model + "': " + e.getMessage(), e);
+        }
+
+        // Verify if the repository is valid with the cursorAgent.getRepositories()
+        // Note: This validation is optional due to API rate limits (1 request per minute)
+        // Skipped due to rate limits
 
         startTime = System.currentTimeMillis();
     }
