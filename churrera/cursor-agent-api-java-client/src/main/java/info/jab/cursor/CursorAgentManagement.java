@@ -21,7 +21,6 @@ public interface CursorAgentManagement {
      * @param model The LLM model to use (e.g., "claude-4-sonnet")
      * @param repository The repository URL where the agent should work
      * @return Agent instance representing the launched agent
-     * @throws Exception if the agent launch fails
      */
     Agent launch(String prompt, String model, String repository);
 
@@ -31,7 +30,6 @@ public interface CursorAgentManagement {
      *
      * @param agentId The ID of the agent to check
      * @return The current Agent instance with updated status
-     * @throws Exception if status check fails
      */
     FollowUpResponse followUp(String agentId, String prompt);
 
@@ -39,7 +37,6 @@ public interface CursorAgentManagement {
      * Deletes a Cursor agent by its ID.
      *
      * @param agentId The ID of the agent to delete
-     * @throws Exception if deletion fails
      */
     void delete(String agentId);
 }

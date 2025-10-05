@@ -12,12 +12,17 @@ import info.jab.cursor.client.model.FollowUpRequest;
 import info.jab.cursor.client.model.FollowUpResponse;
 import info.jab.cursor.client.model.AgentsList;
 import info.jab.cursor.client.model.ConversationResponse;
+import info.jab.cursor.client.model.ApiKeyInfo;
+import info.jab.cursor.client.model.ModelsList;
+import info.jab.cursor.client.model.RepositoriesList;
+import info.jab.cursor.client.api.GeneralEndpointsApi;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.List;
 
 /**
  * Implementation of the Agent interface that provides a simplified abstraction
@@ -26,7 +31,7 @@ import java.util.regex.Matcher;
  * This class encapsulates the complexity of creating API requests and provides
  * a clean interface for launching agents with basic parameters.
  */
-public class CursorAgent implements CursorAgentManagement, CursorAgentInformation {
+public class CursorAgent implements CursorAgentManagement, CursorAgentInformation, CursorAgentGeneralEndpoints {
 
     private static final String DEFAULT_API_BASE_URL = "https://api.cursor.com";
     private static final String DEFAULT_BRANCH = "main";
@@ -35,6 +40,7 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
     private final String apiBaseUrl;
     private final AgentManagementApi agentManagementApi;
     private final AgentInformationApi agentInformationApi;
+    private final GeneralEndpointsApi generalEndpointsApi;
 
     /**
      * Creates a new CursorAgent with the specified API key.
@@ -62,6 +68,7 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
 
         this.agentManagementApi = new AgentManagementApi(apiClient);
         this.agentInformationApi = new AgentInformationApi(apiClient);
+        this.generalEndpointsApi = new GeneralEndpointsApi(apiClient);
     }
 
     // Methods from CursorAgentManagement interface
@@ -276,7 +283,6 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
      *
      * @param agentId The ID of the agent to retrieve conversation for
      * @return ConversationResponse containing the agent's conversation history
-     * @throws Exception if the operation fails
      */
     @Override
     public ConversationResponse getAgentConversation(String agentId) {
@@ -295,4 +301,51 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
             throw new RuntimeException(e);
         }
     }
+
+    // Methods from CursorAgentGeneralEndpoints interface
+
+    @Override
+    public ApiKeyInfo getApiKeyInfo() {
+        // Prepare authentication headers
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + apiKey);
+
+        try {
+           return generalEndpointsApi.getApiKeyInfo(headers);
+        } catch (Exception e) {
+            //info.jab.cursor.client.ApiException;
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<String> getModels() {
+
+        // Prepare authentication headers
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + apiKey);
+
+        try {
+            return generalEndpointsApi.listModels(headers).getModels();
+        } catch (Exception e) {
+            //info.jab.cursor.client.ApiException;
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public RepositoriesList getRepositories() {
+
+        // Prepare authentication headers
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + apiKey);
+
+        try {
+            return generalEndpointsApi.listRepositories(headers);
+        } catch (Exception e) {
+            //info.jab.cursor.client.ApiException;
+            throw new RuntimeException(e);
+        }
+    }
+
 }
