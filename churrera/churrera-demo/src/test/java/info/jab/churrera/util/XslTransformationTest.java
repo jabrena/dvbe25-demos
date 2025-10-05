@@ -40,7 +40,7 @@ class XslTransformationTest {
         @DisplayName("Should successfully transform prompt1.xml to markdown")
         void shouldSuccessfullyTransformPrompt1XmlToMarkdown() throws Exception {
             // Given
-            String pmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String pmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             String xsltContent = ClasspathResolver.retrieve("pml/pml-to-md.xsl");
 
             // When
@@ -61,7 +61,7 @@ class XslTransformationTest {
         @DisplayName("Should handle XSL transformation without throwing exceptions")
         void shouldHandleXslTransformationWithoutThrowingExceptions() {
             // Given
-            String pmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String pmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             String xsltContent = ClasspathResolver.retrieve("pml/pml-to-md.xsl");
 
             // When & Then
@@ -73,7 +73,7 @@ class XslTransformationTest {
         @DisplayName("Should produce consistent transformation results")
         void shouldProduceConsistentTransformationResults() throws Exception {
             // Given
-            String pmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String pmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             String xsltContent = ClasspathResolver.retrieve("pml/pml-to-md.xsl");
 
             // When
@@ -143,7 +143,7 @@ class XslTransformationTest {
         @DisplayName("Should verify transformation output contains expected role content")
         void shouldVerifyTransformationOutputContainsExpectedRoleContent() throws Exception {
             // Given
-            String pmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String pmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             String xsltContent = ClasspathResolver.retrieve("pml/pml-to-md.xsl");
 
             // When
@@ -158,7 +158,7 @@ class XslTransformationTest {
         @DisplayName("Should verify transformation output contains expected goal content")
         void shouldVerifyTransformationOutputContainsExpectedGoalContent() throws Exception {
             // Given
-            String pmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String pmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             String xsltContent = ClasspathResolver.retrieve("pml/pml-to-md.xsl");
 
             // When
@@ -175,7 +175,7 @@ class XslTransformationTest {
         @DisplayName("Should verify transformation output contains expected output format items")
         void shouldVerifyTransformationOutputContainsExpectedOutputFormatItems() throws Exception {
             // Given
-            String pmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String pmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             String xsltContent = ClasspathResolver.retrieve("pml/pml-to-md.xsl");
 
             // When
@@ -194,7 +194,7 @@ class XslTransformationTest {
         @DisplayName("Should verify transformation output contains expected safeguards")
         void shouldVerifyTransformationOutputContainsExpectedSafeguards() throws Exception {
             // Given
-            String pmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String pmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             String xsltContent = ClasspathResolver.retrieve("pml/pml-to-md.xsl");
 
             // When
@@ -232,7 +232,7 @@ class XslTransformationTest {
         @DisplayName("Should handle malformed XSL gracefully")
         void shouldHandleMalformedXslGracefully() {
             // Given
-            String pmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String pmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             String malformedXsl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                     "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\n" +
                     "    <!-- Missing closing tag -->\n" +
@@ -253,7 +253,7 @@ class XslTransformationTest {
         @DisplayName("Should work with PmlConverter.toMarkdown method")
         void shouldWorkWithPmlConverterToMarkdownMethod() {
             // Given
-            String pmlFile = "hello-world/prompt1.xml";
+            String pmlFile = "examples/hello-world/prompt1.xml";
 
             // When & Then
             assertDoesNotThrow(() -> {
@@ -267,7 +267,7 @@ class XslTransformationTest {
         @DisplayName("Should produce same result as direct transformation")
         void shouldProduceSameResultAsDirectTransformation() throws Exception {
             // Given
-            String pmlFile = "hello-world/prompt1.xml";
+            String pmlFile = "examples/hello-world/prompt1.xml";
             String pmlContent = ClasspathResolver.retrieve(pmlFile);
             String xsltContent = ClasspathResolver.retrieve("pml/pml-to-md.xsl");
 

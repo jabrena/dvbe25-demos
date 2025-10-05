@@ -23,7 +23,7 @@ public interface CursorAgentManagement {
      * @return Agent instance representing the launched agent
      * @throws Exception if the agent launch fails
      */
-    Agent launch(String prompt, String model, String repository) throws Exception;
+    Agent launch(String prompt, String model, String repository);
 
     /**
      * Gets the current status of an agent.
@@ -33,7 +33,7 @@ public interface CursorAgentManagement {
      * @return The current Agent instance with updated status
      * @throws Exception if status check fails
      */
-    FollowUpResponse followUp(String agentId, String prompt) throws Exception;
+    FollowUpResponse followUp(String agentId, String prompt);
 
     /**
      * Deletes a Cursor agent by its ID.
@@ -41,5 +41,5 @@ public interface CursorAgentManagement {
      * @param agentId The ID of the agent to delete
      * @throws Exception if deletion fails
      */
-    void delete(String agentId) throws Exception;
+    void delete(String agentId);
 }

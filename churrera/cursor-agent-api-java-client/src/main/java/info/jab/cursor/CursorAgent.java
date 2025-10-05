@@ -76,7 +76,7 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
      * @throws Exception if the agent launch fails
      */
     @Override
-    public Agent launch(String prompt, String model, String repository) throws Exception {
+    public Agent launch(String prompt, String model, String repository) {
         // Validate inputs
         if (prompt == null || prompt.trim().isEmpty()) {
             throw new IllegalArgumentException("Prompt cannot be null or empty");
@@ -113,8 +113,12 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
         headers.put("Authorization", "Bearer " + apiKey);
 
         // Launch the agent
-        Agent result = agentManagementApi.launchAgent(request, headers);
-        return result;
+        try {
+            return agentManagementApi.launchAgent(request, headers);
+        } catch (Exception e) {
+            //info.jab.cursor.client.ApiException;
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -137,7 +141,7 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
 
 
     @Override
-    public FollowUpResponse followUp(String agentId, String prompt) throws Exception {
+    public FollowUpResponse followUp(String agentId, String prompt) {
         // Create the prompt
         Prompt promptObj = new Prompt();
         promptObj.setText(prompt);
@@ -151,12 +155,17 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
         headers.put("Authorization", "Bearer " + apiKey);
 
         // Follow-up the agent
-        return agentManagementApi.addFollowUp(agentId, request, headers);
+        try {
+            return agentManagementApi.addFollowUp(agentId, request, headers);
+        } catch (Exception e) {
+            //info.jab.cursor.client.ApiException;
+            throw new RuntimeException(e);
+        }
     }
 
 
     @Override
-    public void delete(String agentId) throws Exception {
+    public void delete(String agentId) {
         throw new UnsupportedOperationException("Method not implemented yet");
     }
 
@@ -184,7 +193,7 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
      * @throws Exception if status check fails
      */
     @Override
-    public Agent getStatus(String agentId) throws Exception {
+    public Agent getStatus(String agentId) {
         if (agentId == null || agentId.trim().isEmpty()) {
             throw new IllegalArgumentException("Agent ID cannot be null or empty");
         }
@@ -200,9 +209,9 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
             // If status parsing fails due to unknown enum value, try to handle gracefully
             if (statusException.getMessage() != null && statusException.getMessage().contains("Unexpected value")) {
                 // For now, re-throw the exception. The calling layer can handle unknown statuses
-                throw new Exception("Agent status contains unknown value: " + statusException.getMessage(), statusException);
+                throw new RuntimeException("Agent status contains unknown value: " + statusException.getMessage(), statusException);
             } else {
-                throw statusException;
+                throw new RuntimeException(statusException);
             }
         }
     }

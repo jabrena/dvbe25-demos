@@ -5,6 +5,8 @@ import info.jab.cursor.client.model.Agent;
 import info.jab.cursor.client.model.FollowUpResponse;
 import info.jab.churrera.util.ClasspathResolver;
 import info.jab.churrera.util.TimeAccumulated;
+import info.jab.churrera.util.CursorApiKeyResolver;
+import info.jab.churrera.util.PropertyResolver;
 
 public abstract class BaseAgent {
 
@@ -17,26 +19,27 @@ public abstract class BaseAgent {
 
     protected CursorAgent cursorAgent;
 
-    protected BaseAgent(String apiKey, String model, String repository, int delaySeconds) {
-        this.apiKey = apiKey;
-        this.model = model;
-        this.repository = repository;
-        this.delaySeconds = delaySeconds;
+    protected BaseAgent() {
+        String apiKey = CursorApiKeyResolver.resolveApiKey();
+        this.cursorAgent = new CursorAgent(apiKey);
 
-        cursorAgent = new CursorAgent(apiKey);
+        this.model = PropertyResolver.getPropertyAs("application.properties", "model", String.class).get();
+        this.repository = PropertyResolver.getPropertyAs("application.properties", "repository", String.class).get();
+        this.delaySeconds = PropertyResolver.getPropertyAs("application.properties", "delay", Integer.class).get();
+
+        startTime = System.currentTimeMillis();
     }
 
-    protected Agent launchAgent(String prompt) throws Exception {
+    protected Agent launchAgent(String prompt) {
         System.out.println("🚀 Launching cursor background agent...");
         Agent resultAgent = cursorAgent.launch(prompt, model, repository);
         System.out.println("✅ Cursor background agent launched successfully!");
         System.out.println("🔗 Agent Details: " + resultAgent.getTarget().getUrl());
 
-        monitorAgent(resultAgent);
-        return resultAgent;
+        return monitorAgent(resultAgent);
     }
 
-    protected Agent updateAgent(String prompt, String agentId) throws Exception {
+    protected Agent updateAgent(String prompt, String agentId) {
         System.out.println("🚀 Adding new prompt...");
         FollowUpResponse followUpResponse = cursorAgent.followUp(agentId, prompt);
         Agent resultAgent = cursorAgent.getStatus(followUpResponse.getId());
@@ -52,7 +55,7 @@ public abstract class BaseAgent {
      * @return
      * @throws Exception
      */
-    private Agent monitorAgent(Agent agent) throws Exception {
+    private Agent monitorAgent(Agent agent) {
         System.out.println();
         System.out.println("🔄 Starting to monitor agent status...");
         System.out.println("📊 Checking status every " + delaySeconds + " seconds");
@@ -97,11 +100,17 @@ public abstract class BaseAgent {
             } catch (InterruptedException e) {
                 System.out.println("\n⏹️  Monitoring interrupted by user");
                 Thread.currentThread().interrupt();
-                throw e;
+                //Convert to silent exception
+                throw new RuntimeException(e);
             } catch (Exception e) {
                 System.err.println("⚠️  Error during status check: " + e.getMessage());
                 // Continue monitoring despite errors
-                Thread.sleep(delaySeconds * 1000L);
+                try {
+                    Thread.sleep(delaySeconds * 1000L);
+                } catch (InterruptedException ie) {
+                    System.err.println("⚠️  Sleep interrupted, continuing...");
+                    Thread.currentThread().interrupt(); // Restore interrupted status
+                }
             }
         }
 

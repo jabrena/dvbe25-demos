@@ -8,12 +8,17 @@ import java.util.function.Supplier;
  * Utility class for resolving API keys from various sources.
  * Uses functional approach with Optional and flatMap.
  */
-public final class ApiKeyResolver {
+public final class CursorApiKeyResolver {
+
+    /**
+     * The name of the environment variable for the Cursor API key.
+     */
+    public static final String CURSOR_API_KEY = "CURSOR_API_KEY";
 
     /**
      * Private constructor to prevent instantiation of utility class.
      */
-    private ApiKeyResolver() {
+    private CursorApiKeyResolver() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
@@ -29,8 +34,8 @@ public final class ApiKeyResolver {
             .or(() -> resolveFromSystemEnvironment())
             .orElseThrow(() -> new IllegalArgumentException(
                 "API key not found. Please provide it via:\n" +
-                "  1. .env file: CURSOR_API_KEY=YOUR_API_KEY\n" +
-                "  2. Environment variable: export CURSOR_API_KEY=YOUR_API_KEY"
+                "  1. .env file: " + CURSOR_API_KEY + "=YOUR_API_KEY\n" +
+                "  2. Environment variable: export " + CURSOR_API_KEY + "=YOUR_API_KEY"
             ));
     }
 
@@ -48,7 +53,7 @@ public final class ApiKeyResolver {
                     .ignoreIfMissing()
                     .load();
 
-                String envApiKey = dotenv.get("CURSOR_API_KEY");
+                String envApiKey = dotenv.get(CURSOR_API_KEY);
                 if (envApiKey != null && !envApiKey.trim().isEmpty()) {
                     return Optional.of(envApiKey.trim());
                 }
@@ -70,7 +75,7 @@ public final class ApiKeyResolver {
      * Returns Optional.empty() if not found.
      */
     private static Optional<String> resolveFromSystemEnvironment() {
-        return Optional.ofNullable(System.getenv("CURSOR_API_KEY"))
+        return Optional.ofNullable(System.getenv(CURSOR_API_KEY))
             .filter(key -> !key.trim().isEmpty())
             .map(String::trim);
     }
