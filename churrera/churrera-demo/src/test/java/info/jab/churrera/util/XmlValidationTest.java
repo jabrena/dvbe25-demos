@@ -6,7 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Transformer;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -49,7 +50,7 @@ class XmlValidationTest {
         @DisplayName("Should validate that prompt1.xml is well-formed")
         void shouldValidatePrompt1XmlIsWellFormed() throws Exception {
             // Given
-            String xmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String xmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
 
             // When & Then
             assertDoesNotThrow(() -> parseXml(xmlContent),
@@ -91,7 +92,7 @@ class XmlValidationTest {
         @DisplayName("Should validate prompt1.xml against PML XSD schema")
         void shouldValidatePrompt1XmlAgainstPmlSchema() throws Exception {
             // Given
-            String xmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String xmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             String schemaUrl = "https://jabrena.github.io/pml/schemas/0.1.0/pml.xsd";
 
             // When & Then
@@ -136,7 +137,7 @@ class XmlValidationTest {
         @DisplayName("Should verify prompt1.xml has required elements")
         void shouldVerifyPrompt1XmlHasRequiredElements() throws Exception {
             // Given
-            String xmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String xmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             Document document = parseXml(xmlContent);
 
             // When & Then
@@ -173,7 +174,7 @@ class XmlValidationTest {
         @DisplayName("Should verify prompt1.xml has correct namespace declarations")
         void shouldVerifyPrompt1XmlHasCorrectNamespaceDeclarations() throws Exception {
             // Given
-            String xmlContent = ClasspathResolver.retrieve("hello-world/prompt1.xml");
+            String xmlContent = ClasspathResolver.retrieve("examples/hello-world/prompt1.xml");
             Document document = parseXml(xmlContent);
 
             // When & Then
@@ -235,7 +236,7 @@ class XmlValidationTest {
      * @throws Exception if validation fails
      */
     private void validateXslFile(String xslContent) throws Exception {
-        javax.xml.transform.TransformerFactory factory = javax.xml.transform.TransformerFactory.newInstance();
+        TransformerFactory factory = TransformerFactory.newInstance();
         try (InputStream inputStream = new ByteArrayInputStream(xslContent.getBytes(StandardCharsets.UTF_8))) {
             Source source = new StreamSource(inputStream);
             factory.newTransformer(source);

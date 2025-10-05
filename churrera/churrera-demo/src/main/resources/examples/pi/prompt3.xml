@@ -3,30 +3,32 @@
         xsi:noNamespaceSchemaLocation="https://jabrena.github.io/pml/schemas/0.1.0/pml.xsd">
 
     <metadata>
-        <title>Developer a HelloWorld Java Class example</title>
+        <title>Refactor the tests</title>
     </metadata>
 
     <role>You are a Senior software engineer with extensive experience in Java software development</role>
 
-    <goal>
-In the Maven module `sandbox`
-in the package info.jab.examples
-Develop a classic Java class HelloWorld.java program
-that print "Hello World" in the console only
-and not create any test class for this example</goal>
+    <goal>Refactor current tests in this PR with the following System Prompt
+        https://github.com/jabrena/cursor-rules-java/blob/main/.cursor/rules/131-java-unit-testing.md
+
+        If you have doubts, review the git logs to see what files were sent a PR.
+
+        In the refactoring:
+
+        - Use AssertJ asserts
+        - Structure any test with Given When Then
+        - Dont miss Display none and good test method naming
+    </goal>
 
     <output-format>
         <output-format-list>
-            <output-format-item>not invest time in planning</output-format-item>
             <output-format-item>not explain anything</output-format-item>
         </output-format-list>
     </output-format>
 
     <safeguards>
         <safeguards-list>
-            <safeguards-item>not compile individually the solution, use maven</safeguards-item>
-            <safeguards-item>verify the changes with `./mvnw clean compile -pl sandbox`</safeguards-item>
-            <safeguards-item>and not touch the build system files like pom.xml</safeguards-item>
+            <safeguards-item>verify the changes only with `./mvnw clean verify -pl sandbox`</safeguards-item>
             <safeguards-item>if the verification is successful, then the goal is achieved</safeguards-item>
             <safeguards-item>and commit java sources only and push the changes to the branch to create the PR</safeguards-item>
         </safeguards-list>

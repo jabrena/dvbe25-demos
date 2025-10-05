@@ -21,7 +21,7 @@ public interface CursorAgentInformation {
      * @return AgentsList containing the list of agents
      * @throws Exception if the operation fails
      */
-    AgentsList getAgents(Integer limit, String cursor) throws Exception;
+    AgentsList getAgents(Integer limit, String cursor);
 
     /**
      * Gets the current status of a specific agent.
@@ -30,7 +30,7 @@ public interface CursorAgentInformation {
      * @return Agent instance with current status information
      * @throws Exception if the operation fails
      */
-    Agent getStatus(String agentId) throws Exception;
+    Agent getStatus(String agentId);
 
     /**
      * Gets the conversation history for a specific agent.
@@ -39,6 +39,6 @@ public interface CursorAgentInformation {
      * @return ConversationResponse containing the agent's conversation history
      * @throws Exception if the operation fails
      */
-    ConversationResponse getAgentConversation(String agentId) throws Exception;
+    ConversationResponse getAgentConversation(String agentId);
 
 }

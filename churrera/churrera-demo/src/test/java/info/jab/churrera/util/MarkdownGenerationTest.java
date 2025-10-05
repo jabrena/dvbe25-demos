@@ -49,7 +49,7 @@ class MarkdownGenerationTest {
         @DisplayName("Should generate markdown for prompt1.xml")
         void shouldGenerateMarkdownForPrompt1Xml() throws Exception {
             // Given
-            String pmlFile = "hello-world/prompt1.xml";
+            String pmlFile = "examples/hello-world/prompt1.xml";
             String expectedOutputFile = "prompt1.md";
 
             // When
@@ -73,7 +73,7 @@ class MarkdownGenerationTest {
         @DisplayName("Should generate markdown for prompt2.xml")
         void shouldGenerateMarkdownForPrompt2Xml() throws Exception {
             // Given
-            String pmlFile = "hello-world/prompt2.xml";
+            String pmlFile = "examples/hello-world/prompt2.xml";
             String expectedOutputFile = "prompt2.md";
 
             // When
