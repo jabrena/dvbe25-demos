@@ -1,0 +1,490 @@
+[
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "info.jab.pi.PiCalculationBenchmark.benchmarkBothCalculators",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/usr/lib/jvm/java-25-openjdk-amd64/bin/java",
+        "jvmArgs" : [
+            "-Xms2G",
+            "-Xmx2G"
+        ],
+        "jdkVersion" : "25-ea",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25-ea+16-Ubuntu-1",
+        "warmupIterations" : 1,
+        "warmupTime" : "2 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "2 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "precision" : "20"
+        },
+        "primaryMetric" : {
+            "score" : 0.20062438053524867,
+            "scoreError" : 1.5305036163306054,
+            "scoreConfidence" : [
+                -1.3298792357953566,
+                1.7311279968658542
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.11633961874891097,
+                "50.0" : 0.20141536223874598,
+                "90.0" : 0.28411816061808903,
+                "95.0" : 0.28411816061808903,
+                "99.0" : 0.28411816061808903,
+                "99.9" : 0.28411816061808903,
+                "99.99" : 0.28411816061808903,
+                "99.999" : 0.28411816061808903,
+                "99.9999" : 0.28411816061808903,
+                "100.0" : 0.28411816061808903
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.28411816061808903,
+                    0.20141536223874598,
+                    0.11633961874891097
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "info.jab.pi.PiCalculationBenchmark.benchmarkBothCalculators",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/usr/lib/jvm/java-25-openjdk-amd64/bin/java",
+        "jvmArgs" : [
+            "-Xms2G",
+            "-Xmx2G"
+        ],
+        "jdkVersion" : "25-ea",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25-ea+16-Ubuntu-1",
+        "warmupIterations" : 1,
+        "warmupTime" : "2 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "2 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "precision" : "50"
+        },
+        "primaryMetric" : {
+            "score" : 0.19694721581935268,
+            "scoreError" : 0.5775718249000158,
+            "scoreConfidence" : [
+                -0.3806246090806631,
+                0.7745190407193685
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.17250399560988208,
+                "50.0" : 0.18562806269098991,
+                "90.0" : 0.23270958915718598,
+                "95.0" : 0.23270958915718598,
+                "99.0" : 0.23270958915718598,
+                "99.9" : 0.23270958915718598,
+                "99.99" : 0.23270958915718598,
+                "99.999" : 0.23270958915718598,
+                "99.9999" : 0.23270958915718598,
+                "100.0" : 0.23270958915718598
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.23270958915718598,
+                    0.17250399560988208,
+                    0.18562806269098991
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "info.jab.pi.PiCalculationBenchmark.benchmarkBothCalculators",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/usr/lib/jvm/java-25-openjdk-amd64/bin/java",
+        "jvmArgs" : [
+            "-Xms2G",
+            "-Xmx2G"
+        ],
+        "jdkVersion" : "25-ea",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25-ea+16-Ubuntu-1",
+        "warmupIterations" : 1,
+        "warmupTime" : "2 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "2 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "precision" : "100"
+        },
+        "primaryMetric" : {
+            "score" : 0.516902511392669,
+            "scoreError" : 3.567240050051064,
+            "scoreConfidence" : [
+                -3.050337538658395,
+                4.084142561443733
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.36146867618359235,
+                "50.0" : 0.45279846181653866,
+                "90.0" : 0.7364403961778758,
+                "95.0" : 0.7364403961778758,
+                "99.0" : 0.7364403961778758,
+                "99.9" : 0.7364403961778758,
+                "99.99" : 0.7364403961778758,
+                "99.999" : 0.7364403961778758,
+                "99.9999" : 0.7364403961778758,
+                "100.0" : 0.7364403961778758
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.7364403961778758,
+                    0.45279846181653866,
+                    0.36146867618359235
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "info.jab.pi.PiCalculationBenchmark.benchmarkChudnovskyPiCalculator",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/usr/lib/jvm/java-25-openjdk-amd64/bin/java",
+        "jvmArgs" : [
+            "-Xms2G",
+            "-Xmx2G"
+        ],
+        "jdkVersion" : "25-ea",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25-ea+16-Ubuntu-1",
+        "warmupIterations" : 1,
+        "warmupTime" : "2 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "2 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "precision" : "20"
+        },
+        "primaryMetric" : {
+            "score" : 0.08672022352185037,
+            "scoreError" : 0.5700312701599385,
+            "scoreConfidence" : [
+                -0.4833110466380881,
+                0.6567514936817889
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.06034780905689978,
+                "50.0" : 0.07858407333725721,
+                "90.0" : 0.12122878817139408,
+                "95.0" : 0.12122878817139408,
+                "99.0" : 0.12122878817139408,
+                "99.9" : 0.12122878817139408,
+                "99.99" : 0.12122878817139408,
+                "99.999" : 0.12122878817139408,
+                "99.9999" : 0.12122878817139408,
+                "100.0" : 0.12122878817139408
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.12122878817139408,
+                    0.06034780905689978,
+                    0.07858407333725721
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "info.jab.pi.PiCalculationBenchmark.benchmarkChudnovskyPiCalculator",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/usr/lib/jvm/java-25-openjdk-amd64/bin/java",
+        "jvmArgs" : [
+            "-Xms2G",
+            "-Xmx2G"
+        ],
+        "jdkVersion" : "25-ea",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25-ea+16-Ubuntu-1",
+        "warmupIterations" : 1,
+        "warmupTime" : "2 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "2 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "precision" : "50"
+        },
+        "primaryMetric" : {
+            "score" : 0.11748253262952646,
+            "scoreError" : 1.2578168507000465,
+            "scoreConfidence" : [
+                -1.1403343180705199,
+                1.375299383329573
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.07426874988860835,
+                "50.0" : 0.08118549153711897,
+                "90.0" : 0.1969933564628521,
+                "95.0" : 0.1969933564628521,
+                "99.0" : 0.1969933564628521,
+                "99.9" : 0.1969933564628521,
+                "99.99" : 0.1969933564628521,
+                "99.999" : 0.1969933564628521,
+                "99.9999" : 0.1969933564628521,
+                "100.0" : 0.1969933564628521
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.1969933564628521,
+                    0.07426874988860835,
+                    0.08118549153711897
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "info.jab.pi.PiCalculationBenchmark.benchmarkChudnovskyPiCalculator",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/usr/lib/jvm/java-25-openjdk-amd64/bin/java",
+        "jvmArgs" : [
+            "-Xms2G",
+            "-Xmx2G"
+        ],
+        "jdkVersion" : "25-ea",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25-ea+16-Ubuntu-1",
+        "warmupIterations" : 1,
+        "warmupTime" : "2 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "2 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "precision" : "100"
+        },
+        "primaryMetric" : {
+            "score" : 0.15804232460957934,
+            "scoreError" : 0.3041601377792277,
+            "scoreConfidence" : [
+                -0.14611781316964834,
+                0.462202462388807
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.13905660143214682,
+                "50.0" : 0.16477587997363868,
+                "90.0" : 0.1702944924229525,
+                "95.0" : 0.1702944924229525,
+                "99.0" : 0.1702944924229525,
+                "99.9" : 0.1702944924229525,
+                "99.99" : 0.1702944924229525,
+                "99.999" : 0.1702944924229525,
+                "99.9999" : 0.1702944924229525,
+                "100.0" : 0.1702944924229525
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.16477587997363868,
+                    0.13905660143214682,
+                    0.1702944924229525
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "info.jab.pi.PiCalculationBenchmark.benchmarkMachinLikePiCalculator",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/usr/lib/jvm/java-25-openjdk-amd64/bin/java",
+        "jvmArgs" : [
+            "-Xms2G",
+            "-Xmx2G"
+        ],
+        "jdkVersion" : "25-ea",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25-ea+16-Ubuntu-1",
+        "warmupIterations" : 1,
+        "warmupTime" : "2 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "2 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "precision" : "20"
+        },
+        "primaryMetric" : {
+            "score" : 0.03157910305855153,
+            "scoreError" : 0.08720026437905158,
+            "scoreConfidence" : [
+                -0.05562116132050005,
+                0.11877936743760312
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.02637263685701113,
+                "50.0" : 0.03259631794997148,
+                "90.0" : 0.03576835436867199,
+                "95.0" : 0.03576835436867199,
+                "99.0" : 0.03576835436867199,
+                "99.9" : 0.03576835436867199,
+                "99.99" : 0.03576835436867199,
+                "99.999" : 0.03576835436867199,
+                "99.9999" : 0.03576835436867199,
+                "100.0" : 0.03576835436867199
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.03576835436867199,
+                    0.02637263685701113,
+                    0.03259631794997148
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "info.jab.pi.PiCalculationBenchmark.benchmarkMachinLikePiCalculator",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/usr/lib/jvm/java-25-openjdk-amd64/bin/java",
+        "jvmArgs" : [
+            "-Xms2G",
+            "-Xmx2G"
+        ],
+        "jdkVersion" : "25-ea",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25-ea+16-Ubuntu-1",
+        "warmupIterations" : 1,
+        "warmupTime" : "2 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "2 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "precision" : "50"
+        },
+        "primaryMetric" : {
+            "score" : 0.12930944409303594,
+            "scoreError" : 0.24540072072666158,
+            "scoreConfidence" : [
+                -0.11609127663362565,
+                0.37471016481969754
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.11381645553415656,
+                "50.0" : 0.13610127668978647,
+                "90.0" : 0.1380106000551648,
+                "95.0" : 0.1380106000551648,
+                "99.0" : 0.1380106000551648,
+                "99.9" : 0.1380106000551648,
+                "99.99" : 0.1380106000551648,
+                "99.999" : 0.1380106000551648,
+                "99.9999" : 0.1380106000551648,
+                "100.0" : 0.1380106000551648
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.1380106000551648,
+                    0.13610127668978647,
+                    0.11381645553415656
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    },
+    {
+        "jmhVersion" : "1.37",
+        "benchmark" : "info.jab.pi.PiCalculationBenchmark.benchmarkMachinLikePiCalculator",
+        "mode" : "avgt",
+        "threads" : 1,
+        "forks" : 1,
+        "jvm" : "/usr/lib/jvm/java-25-openjdk-amd64/bin/java",
+        "jvmArgs" : [
+            "-Xms2G",
+            "-Xmx2G"
+        ],
+        "jdkVersion" : "25-ea",
+        "vmName" : "OpenJDK 64-Bit Server VM",
+        "vmVersion" : "25-ea+16-Ubuntu-1",
+        "warmupIterations" : 1,
+        "warmupTime" : "2 s",
+        "warmupBatchSize" : 1,
+        "measurementIterations" : 3,
+        "measurementTime" : "2 s",
+        "measurementBatchSize" : 1,
+        "params" : {
+            "precision" : "100"
+        },
+        "primaryMetric" : {
+            "score" : 0.3761479793551541,
+            "scoreError" : 1.574984379222928,
+            "scoreConfidence" : [
+                -1.198836399867774,
+                1.9511323585780822
+            ],
+            "scorePercentiles" : {
+                "0.0" : 0.28729226234213545,
+                "50.0" : 0.381442718344775,
+                "90.0" : 0.4597089573785518,
+                "95.0" : 0.4597089573785518,
+                "99.0" : 0.4597089573785518,
+                "99.9" : 0.4597089573785518,
+                "99.99" : 0.4597089573785518,
+                "99.999" : 0.4597089573785518,
+                "99.9999" : 0.4597089573785518,
+                "100.0" : 0.4597089573785518
+            },
+            "scoreUnit" : "ms/op",
+            "rawData" : [
+                [
+                    0.4597089573785518,
+                    0.381442718344775,
+                    0.28729226234213545
+                ]
+            ]
+        },
+        "secondaryMetrics" : {
+        }
+    }
+]
+
+
