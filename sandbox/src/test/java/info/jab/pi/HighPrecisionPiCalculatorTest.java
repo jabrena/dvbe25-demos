@@ -8,12 +8,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("High Precision Pi Calculator Tests")
 class HighPrecisionPiCalculatorTest {
 
     private static final String EXPECTED_PI_HIGH_PRECISION = "3.14159265358979323846";
+    private static final int TEST_PRECISION = 20;
 
     /**
      * Provides instances of different Pi calculation implementations for parameterized testing.
@@ -29,19 +30,25 @@ class HighPrecisionPiCalculatorTest {
 
     @ParameterizedTest
     @MethodSource("piCalculatorProvider")
-    @DisplayName("Should calculate Pi with high precision")
-    void testCalculatePiHighPrecision(HighPrecisionPiCalculator calculator) {
-        // Test with 20 decimal places precision
-        int precision = 20;
-
-        BigDecimal calculatedPi = calculator.calculatePiHighPrecision(precision);
-
-        // Convert expected value to BigDecimal with same scale for comparison
+    @DisplayName("Should calculate Pi with 20 decimal places precision matching expected mathematical value")
+    void should_calculatePiWithHighPrecision_when_requestedPrecisionIs20DecimalPlaces(HighPrecisionPiCalculator calculator) {
+        // Given
+        int requestedPrecision = TEST_PRECISION;
         BigDecimal expectedPi = new BigDecimal(EXPECTED_PI_HIGH_PRECISION)
-                .setScale(precision, RoundingMode.HALF_UP);
+                .setScale(requestedPrecision, RoundingMode.HALF_UP);
 
-        assertEquals(expectedPi, calculatedPi,
-                String.format("Pi calculation should match expected value for algorithm: %s",
-                        calculator.getClass().getSimpleName()));
+        // When
+        BigDecimal actualCalculatedPi = calculator.calculatePiHighPrecision(requestedPrecision);
+
+        // Then
+        assertThat(actualCalculatedPi)
+                .as("Pi calculation for %s should match expected mathematical value with %d decimal places", 
+                    calculator.getClass().getSimpleName(), requestedPrecision)
+                .isEqualByComparingTo(expectedPi)
+                .satisfies(result -> {
+                    assertThat(result.scale())
+                            .as("Result should have exactly %d decimal places", requestedPrecision)
+                            .isEqualTo(requestedPrecision);
+                });
     }
 }
