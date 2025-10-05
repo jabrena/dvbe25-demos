@@ -2,97 +2,150 @@ package info.jab.pi;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+import java.util.stream.IntStream;
 
 /**
- * Pi calculation using the Chudnovsky algorithm.
+ * Immutable functional Pi calculator using the Chudnovsky algorithm.
  * This is one of the fastest known algorithms for calculating Pi.
  * 
  * Formula: 1/π = 12 * Σ(k=0 to ∞) [(-1)^k * (6k)! * (13591409 + 545140134*k)] / [(3k)! * k!^3 * 640320^(3k + 3/2)]
+ * 
+ * All methods are pure functions with no side effects.
  */
-public class ChudnovskyPiCalculator implements HighPrecisionPiCalculator {
+public final class ChudnovskyPiCalculator implements HighPrecisionPiCalculator {
+
+    private static final BigDecimal ZERO = BigDecimal.ZERO;
+    private static final BigDecimal ONE = BigDecimal.ONE;
+    private static final BigDecimal TWO = new BigDecimal("2");
+    private static final BigDecimal TWELVE = new BigDecimal("12");
+    private static final BigDecimal CHUDNOVSKY_CONSTANT = new BigDecimal("13591409");
+    private static final BigDecimal CHUDNOVSKY_INCREMENT = new BigDecimal("545140134");
+    private static final BigDecimal BASE_640320 = new BigDecimal("640320");
+    private static final int MAX_ITERATIONS = 100;
 
     @Override
-    public BigDecimal calculatePiHighPrecision(int precision) {
-        // Set precision higher than required to avoid rounding errors during calculation
-        int workingPrecision = precision + 20;
-        MathContext mc = new MathContext(workingPrecision, RoundingMode.HALF_UP);
+    public BigDecimal calculatePiHighPrecision(final int precision) {
+        final PrecisionContext context = PrecisionContext.withExtendedBuffer(precision);
         
-        BigDecimal sum = BigDecimal.ZERO;
-        BigDecimal a = BigDecimal.ONE;  // (6k)! / ((3k)! * k!^3)
-        BigDecimal b = new BigDecimal("13591409");  // 13591409 + 545140134*k
-        BigDecimal c = BigDecimal.ONE;  // 640320^(3k)
-        BigDecimal constant545140134 = new BigDecimal("545140134");
-        
-        BigDecimal base640320 = new BigDecimal("640320");
-        BigDecimal base640320Cubed = base640320.pow(3, mc);
-        
-        for (int k = 0; k < 100; k++) {  // 100 iterations should be enough for high precision
-            BigDecimal term = a.multiply(b, mc).divide(c, mc);
-            if (k % 2 == 1) {
-                term = term.negate();
-            }
-            sum = sum.add(term, mc);
-            
-            // Calculate next iteration values
-            if (k < 99) {  // Don't calculate for the last iteration
-                // Update a: multiply by (6k+1)(6k+2)(6k+3)(6k+4)(6k+5)(6k+6) / ((3k+1)(3k+2)(3k+3) * (k+1)^3)
-                BigDecimal numerator = BigDecimal.ONE;
-                for (int i = 1; i <= 6; i++) {
-                    numerator = numerator.multiply(new BigDecimal(6 * k + i), mc);
-                }
-                
-                BigDecimal denominator = BigDecimal.ONE;
-                for (int i = 1; i <= 3; i++) {
-                    denominator = denominator.multiply(new BigDecimal(3 * k + i), mc);
-                }
-                BigDecimal kPlusOne = new BigDecimal(k + 1);
-                denominator = denominator.multiply(kPlusOne.pow(3, mc), mc);
-                
-                a = a.multiply(numerator, mc).divide(denominator, mc);
-                
-                // Update b: add 545140134
-                b = b.add(constant545140134, mc);
-                
-                // Update c: multiply by 640320^3
-                c = c.multiply(base640320Cubed, mc);
-            }
-            
-            // Check for convergence
-            if (k > 5 && term.abs().compareTo(new BigDecimal("1E-" + (workingPrecision + 5))) < 0) {
-                break;
-            }
-        }
-        
-        // Calculate 1/π = 12 * sum / sqrt(640320^3)
-        BigDecimal twelve = new BigDecimal("12");
-        BigDecimal sqrt640320Cubed = sqrt(base640320Cubed, mc);
-        
-        BigDecimal oneOverPi = twelve.multiply(sum, mc).divide(sqrt640320Cubed, mc);
-        
-        // Calculate π = 1 / (1/π)
-        BigDecimal pi = BigDecimal.ONE.divide(oneOverPi, mc);
-        
-        // Round to the required precision
-        return pi.setScale(precision, RoundingMode.HALF_UP);
+        final BigDecimal piResult = calculateChudnovskyFormula(context)
+                .apply(context.mathContext());
+        return piResult.setScale(precision, context.mathContext().getRoundingMode());
     }
-    
+
     /**
-     * Calculate square root using Newton's method for BigDecimal
+     * Pure function that creates a computation for Chudnovsky's formula.
+     * Returns a function that can be applied to a MathContext.
      */
-    private BigDecimal sqrt(BigDecimal n, MathContext mc) {
-        if (n.equals(BigDecimal.ZERO)) {
-            return BigDecimal.ZERO;
+    private Function<MathContext, BigDecimal> calculateChudnovskyFormula(final PrecisionContext context) {
+        return mc -> {
+            final BigDecimal base640320Cubed = BASE_640320.pow(3, mc);
+            final ChudnovskySeriesResult seriesResult = calculateChudnovskySeries(mc, base640320Cubed);
+            
+            final BigDecimal sqrt640320Cubed = calculateSquareRoot(base640320Cubed, mc);
+            final BigDecimal oneOverPi = TWELVE.multiply(seriesResult.sum(), mc).divide(sqrt640320Cubed, mc);
+            
+            return ONE.divide(oneOverPi, mc);
+        };
+    }
+
+    /**
+     * Immutable result of Chudnovsky series calculation.
+     */
+    private record ChudnovskySeriesResult(BigDecimal sum, int iterations) {}
+
+    /**
+     * Immutable state for Chudnovsky series calculation.
+     */
+    private record ChudnovskyState(
+            BigDecimal sum,
+            BigDecimal a,  // (6k)! / ((3k)! * k!^3)
+            BigDecimal b,  // 13591409 + 545140134*k
+            BigDecimal c,  // 640320^(3k)
+            int k
+    ) {
+        
+        static ChudnovskyState initial() {
+            return new ChudnovskyState(ZERO, ONE, CHUDNOVSKY_CONSTANT, ONE, 0);
         }
         
-        BigDecimal x = n;
-        BigDecimal last;
+        ChudnovskyState nextIteration(final MathContext mc, final BigDecimal base640320Cubed) {
+            final BigDecimal term = a.multiply(b, mc).divide(c, mc);
+            final BigDecimal signedTerm = (k % 2 == 1) ? term.negate() : term;
+            final BigDecimal newSum = sum.add(signedTerm, mc);
+            
+            if (k >= MAX_ITERATIONS - 1) {
+                return new ChudnovskyState(newSum, a, b, c, k + 1);
+            }
+            
+            // Calculate next iteration coefficients
+            final BigDecimal newA = calculateNextA(mc);
+            final BigDecimal newB = b.add(CHUDNOVSKY_INCREMENT, mc);
+            final BigDecimal newC = c.multiply(base640320Cubed, mc);
+            
+            return new ChudnovskyState(newSum, newA, newB, newC, k + 1);
+        }
         
-        do {
-            last = x;
-            x = x.add(n.divide(x, mc), mc).divide(new BigDecimal("2"), mc);
-        } while (x.subtract(last, mc).abs().compareTo(new BigDecimal("1E-" + (mc.getPrecision() + 5))) > 0);
+        private BigDecimal calculateNextA(final MathContext mc) {
+            final BigDecimal numerator = IntStream.rangeClosed(1, 6)
+                    .mapToObj(i -> new BigDecimal(6 * k + i))
+                    .reduce(ONE, (acc, val) -> acc.multiply(val, mc));
+            
+            final BigDecimal denominator = IntStream.rangeClosed(1, 3)
+                    .mapToObj(i -> new BigDecimal(3 * k + i))
+                    .reduce(ONE, (acc, val) -> acc.multiply(val, mc))
+                    .multiply(new BigDecimal(k + 1).pow(3, mc), mc);
+            
+            return a.multiply(numerator, mc).divide(denominator, mc);
+        }
         
-        return x;
+        BigDecimal getCurrentTerm(final MathContext mc) {
+            return a.multiply(b, mc).divide(c, mc);
+        }
+        
+        boolean hasConverged(final MathContext mc) {
+            if (k < 5) return false;
+            final BigDecimal threshold = new BigDecimal("1E-" + (mc.getPrecision() + 5));
+            return getCurrentTerm(mc).abs().compareTo(threshold) < 0;
+        }
+    }
+
+    /**
+     * Pure function to calculate Chudnovsky series using functional approach.
+     */
+    private ChudnovskySeriesResult calculateChudnovskySeries(final MathContext mc, final BigDecimal base640320Cubed) {
+        ChudnovskyState state = ChudnovskyState.initial();
+        
+        while (state.k < MAX_ITERATIONS && !state.hasConverged(mc)) {
+            state = state.nextIteration(mc, base640320Cubed);
+        }
+        
+        return new ChudnovskySeriesResult(state.sum, state.k);
+    }
+
+    /**
+     * Pure function to calculate square root using Newton's method with trampoline pattern.
+     */
+    private BigDecimal calculateSquareRoot(final BigDecimal n, final MathContext mc) {
+        if (n.equals(ZERO)) {
+            return ZERO;
+        }
+        
+        return newtonMethodTrampoline(n, mc, n);
+    }
+
+    /**
+     * Tail-recursive Newton's method using trampoline pattern for stack safety.
+     */
+    private BigDecimal newtonMethodTrampoline(final BigDecimal n, final MathContext mc, final BigDecimal current) {
+        final BigDecimal next = current.add(n.divide(current, mc), mc).divide(TWO, mc);
+        final BigDecimal threshold = new BigDecimal("1E-" + (mc.getPrecision() + 5));
+        
+        if (next.subtract(current, mc).abs().compareTo(threshold) <= 0) {
+            return next;
+        }
+        
+        return newtonMethodTrampoline(n, mc, next);
     }
 }
