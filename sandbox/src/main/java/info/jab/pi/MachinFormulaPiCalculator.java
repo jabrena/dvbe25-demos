@@ -7,57 +7,129 @@ import java.math.RoundingMode;
 /**
  * Pi calculation using Machin's formula: π/4 = 4*arctan(1/5) - arctan(1/239)
  * This gives us: π = 4 * (4*arctan(1/5) - arctan(1/239))
+ * 
+ * This implementation follows functional programming principles with immutable state
+ * and pure functions.
  */
-public class MachinFormulaPiCalculator implements HighPrecisionPiCalculator {
+public final class MachinFormulaPiCalculator implements HighPrecisionPiCalculator {
+
+    // Constants for Machin's formula
+    private static final BigDecimal ONE_FIFTH = new BigDecimal("0.2");
+    private static final BigDecimal ONE_239TH = new BigDecimal(1).divide(new BigDecimal(239), MathContext.DECIMAL128);
+    private static final BigDecimal FOUR = BigDecimal.valueOf(4);
 
     @Override
     public BigDecimal calculatePiHighPrecision(int precision) {
-        // Set precision with extra digits for intermediate calculations
-        MathContext mc = new MathContext(precision + 10, RoundingMode.HALF_UP);
+        MathContext mc = createMathContext(precision);
         
-        // Calculate arctan(1/5) and arctan(1/239) using Taylor series
-        BigDecimal arctan1_5 = arctan(new BigDecimal("0.2"), mc);
-        BigDecimal arctan1_239 = arctan(new BigDecimal(1).divide(new BigDecimal(239), mc), mc);
-        
-        // Apply Machin's formula: π = 4 * (4*arctan(1/5) - arctan(1/239))
-        BigDecimal pi = BigDecimal.valueOf(4)
-            .multiply(
-                BigDecimal.valueOf(4).multiply(arctan1_5, mc)
-                .subtract(arctan1_239, mc), mc);
-        
-        // Round to requested precision
-        return pi.setScale(precision, RoundingMode.HALF_UP);
+        return computePiUsingMachinFormula(mc, precision);
     }
 
     /**
-     * Calculate arctan(x) using Taylor series expansion:
+     * Pure function to create MathContext with appropriate precision buffer.
+     */
+    private static MathContext createMathContext(int precision) {
+        return new MathContext(precision + 10, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Pure function that computes Pi using Machin's formula.
+     */
+    private static BigDecimal computePiUsingMachinFormula(MathContext mc, int precision) {
+        BigDecimal arctan1_5 = computeArctan(ONE_FIFTH, mc);
+        BigDecimal arctan1_239 = computeArctan(ONE_239TH, mc);
+        
+        // Apply Machin's formula: π = 4 * (4*arctan(1/5) - arctan(1/239))
+        BigDecimal piValue = FOUR.multiply(
+            FOUR.multiply(arctan1_5, mc).subtract(arctan1_239, mc), mc);
+        
+        return piValue.setScale(precision, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Pure function to calculate arctan(x) using Taylor series expansion:
      * arctan(x) = x - x³/3 + x⁵/5 - x⁷/7 + ...
      */
-    private BigDecimal arctan(BigDecimal x, MathContext mc) {
-        BigDecimal result = BigDecimal.ZERO;
-        BigDecimal xSquared = x.multiply(x, mc);
-        BigDecimal power = x; // current power of x
+    private static BigDecimal computeArctan(BigDecimal x, MathContext mc) {
+        ArctanSeries series = ArctanSeries.initialize(x, mc);
+        return series.calculateConvergentSum(mc);
+    }
+
+    /**
+     * Immutable record representing the state of an arctan Taylor series calculation.
+     */
+    private record ArctanSeries(
+        BigDecimal x,
+        BigDecimal xSquared,
+        BigDecimal convergenceThreshold
+    ) {
         
-        int n = 1;
-        int sign = 1;
-        
-        while (power.abs().compareTo(new BigDecimal("1E-" + (mc.getPrecision() - 2))) > 0) {
-            BigDecimal term = power.divide(new BigDecimal(n), mc);
-            
-            if (sign > 0) {
-                result = result.add(term, mc);
-            } else {
-                result = result.subtract(term, mc);
-            }
-            
-            power = power.multiply(xSquared, mc);
-            n += 2;
-            sign *= -1;
-            
-            // Prevent infinite loop
-            if (n > 10000) break;
+        static ArctanSeries initialize(BigDecimal x, MathContext mc) {
+            BigDecimal threshold = new BigDecimal("1E-" + (mc.getPrecision() - 2));
+            return new ArctanSeries(x, x.multiply(x, mc), threshold);
         }
         
-        return result;
+        BigDecimal calculateConvergentSum(MathContext mc) {
+            return calculateTermsUntilConvergence(
+                ArctanTermState.initial(x), 
+                mc
+            );
+        }
+        
+        private BigDecimal calculateTermsUntilConvergence(ArctanTermState state, MathContext mc) {
+            if (!state.isSignificant(convergenceThreshold) || state.exceedsMaxIterations()) {
+                return state.result();
+            }
+            
+            ArctanTermState nextState = state.nextTerm(xSquared, mc);
+            return calculateTermsUntilConvergence(nextState, mc);
+        }
+    }
+
+    /**
+     * Immutable record representing the state of a single term in the arctan series.
+     */
+    private record ArctanTermState(
+        BigDecimal result,
+        BigDecimal currentPower,
+        int denominator,
+        int sign,
+        int iteration
+    ) {
+        
+        private static final int MAX_ITERATIONS = 10000;
+        
+        static ArctanTermState initial(BigDecimal x) {
+            return new ArctanTermState(
+                BigDecimal.ZERO,
+                x,
+                1,
+                1,
+                0
+            );
+        }
+        
+        ArctanTermState nextTerm(BigDecimal xSquared, MathContext mc) {
+            BigDecimal term = currentPower.divide(new BigDecimal(denominator), mc);
+            BigDecimal newResult = (sign > 0) ? 
+                result.add(term, mc) : 
+                result.subtract(term, mc);
+            
+            return new ArctanTermState(
+                newResult,
+                currentPower.multiply(xSquared, mc),
+                denominator + 2,
+                -sign,
+                iteration + 1
+            );
+        }
+        
+        boolean isSignificant(BigDecimal threshold) {
+            return currentPower.abs().compareTo(threshold) > 0;
+        }
+        
+        boolean exceedsMaxIterations() {
+            return iteration >= MAX_ITERATIONS;
+        }
     }
 }

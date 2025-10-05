@@ -4,110 +4,151 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 /**
  * Pi calculation using the Chudnovsky algorithm.
  * This is one of the fastest known algorithms for computing π.
  * 
  * Formula: 1/π = 12 * Σ(k=0 to ∞) [(-1)^k * (6k)! * (545140134*k + 13591409)] / [(3k)! * (k!)^3 * 640320^(3k+3/2)]
+ * 
+ * This implementation follows functional programming principles with immutable state
+ * and pure functions.
  */
-public class ChudnovskyAlgorithmPiCalculator implements HighPrecisionPiCalculator {
+public final class ChudnovskyAlgorithmPiCalculator implements HighPrecisionPiCalculator {
+
+    // Constants for the Chudnovsky algorithm
+    private static final long CONSTANT_A = 545140134L;
+    private static final long CONSTANT_B = 13591409L;
+    private static final long CONSTANT_C = 640320L;
+    private static final BigDecimal CONSTANT_426880 = new BigDecimal("426880");
+    private static final BigDecimal CONSTANT_10005 = new BigDecimal("10005");
 
     @Override
     public BigDecimal calculatePiHighPrecision(int precision) {
-        // Set precision with extra digits for intermediate calculations
-        MathContext mc = new MathContext(precision + 20, RoundingMode.HALF_UP);
+        MathContext mc = createMathContext(precision);
         
-        BigDecimal sum = BigDecimal.ZERO;
-        BigDecimal c = new BigDecimal("426880").multiply(sqrt(new BigDecimal("10005"), mc), mc);
+        return computePiUsingChudnovskyFormula(precision, mc);
+    }
+
+    /**
+     * Pure function to create MathContext with appropriate precision buffer.
+     */
+    private static MathContext createMathContext(int precision) {
+        return new MathContext(precision + 20, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Pure function that computes Pi using the Chudnovsky formula.
+     */
+    private static BigDecimal computePiUsingChudnovskyFormula(int precision, MathContext mc) {
+        BigDecimal c = CONSTANT_426880.multiply(sqrt(CONSTANT_10005, mc), mc);
         
-        // Calculate series terms until convergence
-        for (int k = 0; k < precision / 14 + 5; k++) {
-            BigDecimal term = calculateTerm(k, mc);
-            sum = sum.add(term, mc);
-            
-            // Check for convergence
-            if (term.abs().compareTo(new BigDecimal("1E-" + (precision + 10))) < 0) {
-                break;
+        BigDecimal seriesSum = IntStream.range(0, precision / 14 + 5)
+            .mapToObj(k -> calculateSeriesTerm(k, mc))
+            .takeWhile(term -> isTermSignificant(term, precision))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        return c.divide(seriesSum, mc).setScale(precision, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Pure function to determine if a series term is still significant for the calculation.
+     */
+    private static boolean isTermSignificant(BigDecimal term, int precision) {
+        BigDecimal threshold = new BigDecimal("1E-" + (precision + 10));
+        return term.abs().compareTo(threshold) >= 0;
+    }
+
+    /**
+     * Pure function to calculate individual term for Chudnovsky series.
+     */
+    private static BigDecimal calculateSeriesTerm(int k, MathContext mc) {
+        ChudnovskyTerm term = ChudnovskyTerm.forIteration(k);
+        return term.calculateValue(mc);
+    }
+
+    /**
+     * Immutable record representing a Chudnovsky series term.
+     */
+    private record ChudnovskyTerm(
+        int iteration,
+        BigInteger factorial6k,
+        BigInteger factorial3k,
+        BigInteger factorialKCubed,
+        BigInteger numeratorConstant,
+        int sign
+    ) {
+        
+        static ChudnovskyTerm forIteration(int k) {
+            return new ChudnovskyTerm(
+                k,
+                computeFactorial(6 * k),
+                computeFactorial(3 * k),
+                computeFactorial(k).pow(3),
+                computeNumeratorConstant(k),
+                (k % 2 == 0) ? 1 : -1
+            );
+        }
+        
+        BigDecimal calculateValue(MathContext mc) {
+            BigInteger numerator = factorial6k.multiply(numeratorConstant);
+            if (sign < 0) {
+                numerator = numerator.negate();
             }
+            
+            BigInteger denominator = factorial3k
+                .multiply(factorialKCubed)
+                .multiply(BigInteger.valueOf(CONSTANT_C).pow(3 * iteration));
+            
+            return new BigDecimal(numerator).divide(new BigDecimal(denominator), mc);
         }
         
-        // Calculate π = c / sum
-        BigDecimal pi = c.divide(sum, mc);
-        
-        // Round to requested precision
-        return pi.setScale(precision, RoundingMode.HALF_UP);
-    }
-    
-    /**
-     * Calculate individual term for Chudnovsky series
-     */
-    private BigDecimal calculateTerm(int k, MathContext mc) {
-        // Calculate (6k)!
-        BigInteger factorial6k = factorial(6 * k);
-        
-        // Calculate (3k)!
-        BigInteger factorial3k = factorial(3 * k);
-        
-        // Calculate (k!)^3
-        BigInteger factorialK = factorial(k);
-        BigInteger factorialKCubed = factorialK.pow(3);
-        
-        // Calculate 545140134*k + 13591409
-        BigInteger numeratorConstant = BigInteger.valueOf(545140134L)
-            .multiply(BigInteger.valueOf(k))
-            .add(BigInteger.valueOf(13591409L));
-        
-        // Calculate (-1)^k
-        int sign = (k % 2 == 0) ? 1 : -1;
-        
-        // Calculate numerator: (-1)^k * (6k)! * (545140134*k + 13591409)
-        BigInteger numerator = factorial6k.multiply(numeratorConstant);
-        if (sign < 0) {
-            numerator = numerator.negate();
+        private static BigInteger computeNumeratorConstant(int k) {
+            return BigInteger.valueOf(CONSTANT_A)
+                .multiply(BigInteger.valueOf(k))
+                .add(BigInteger.valueOf(CONSTANT_B));
         }
-        
-        // Calculate denominator: (3k)! * (k!)^3 * 640320^(3k)
-        BigInteger denominator = factorial3k.multiply(factorialKCubed);
-        BigInteger power640320 = BigInteger.valueOf(640320L).pow(3 * k);
-        denominator = denominator.multiply(power640320);
-        
-        // Convert to BigDecimal and divide
-        BigDecimal numeratorBD = new BigDecimal(numerator);
-        BigDecimal denominatorBD = new BigDecimal(denominator);
-        
-        return numeratorBD.divide(denominatorBD, mc);
     }
-    
+
     /**
-     * Calculate factorial of n
+     * Pure function to calculate factorial using functional approach with memoization opportunity.
+     * This implementation uses IntStream for functional style while maintaining efficiency.
      */
-    private BigInteger factorial(int n) {
-        if (n <= 1) return BigInteger.ONE;
-        
-        BigInteger result = BigInteger.ONE;
-        for (int i = 2; i <= n; i++) {
-            result = result.multiply(BigInteger.valueOf(i));
-        }
-        return result;
+    private static BigInteger computeFactorial(int n) {
+        return (n <= 1) ? BigInteger.ONE : 
+            IntStream.rangeClosed(2, n)
+                .mapToObj(BigInteger::valueOf)
+                .reduce(BigInteger.ONE, BigInteger::multiply);
     }
-    
+
     /**
-     * Calculate square root using Newton's method
+     * Pure function to calculate square root using Newton's method.
+     * Uses functional iteration with takeWhile for convergence.
      */
-    private BigDecimal sqrt(BigDecimal value, MathContext mc) {
+    private static BigDecimal sqrt(BigDecimal value, MathContext mc) {
         if (value.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
+
+        Function<BigDecimal, BigDecimal> newtonStep = x -> 
+            x.add(value.divide(x, mc)).divide(BigDecimal.valueOf(2), mc);
         
-        BigDecimal x = value;
-        BigDecimal prev;
+        BigDecimal threshold = new BigDecimal("1E-" + (mc.getPrecision() - 5));
         
-        do {
-            prev = x;
-            x = x.add(value.divide(x, mc)).divide(BigDecimal.valueOf(2), mc);
-        } while (x.subtract(prev).abs().compareTo(new BigDecimal("1E-" + (mc.getPrecision() - 5))) > 0);
+        return newtonIteration(value, newtonStep, threshold, mc);
+    }
+
+    /**
+     * Pure recursive function for Newton's method iteration using functional approach.
+     */
+    private static BigDecimal newtonIteration(BigDecimal current, Function<BigDecimal, BigDecimal> step, 
+                                            BigDecimal threshold, MathContext mc) {
+        BigDecimal next = step.apply(current);
+        BigDecimal difference = next.subtract(current).abs();
         
-        return x;
+        return (difference.compareTo(threshold) <= 0) ? next :
+            newtonIteration(next, step, threshold, mc);
     }
 }
