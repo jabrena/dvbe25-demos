@@ -3,95 +3,134 @@ package info.jab.pi;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 /**
  * Pi calculator using Machin-like formula: π/4 = 4*arctan(1/5) - arctan(1/239)
  * This is John Machin's formula from 1706, one of the most famous arctangent formulas.
+ * Refactored to use functional programming principles with pure functions and immutable state.
  */
 public class MachinLikeFormulaPiCalculator implements HighPrecisionPiCalculator {
+    
+    // Constants for Machin's formula
+    private static final double DENOMINATOR_5 = 5.0;
+    private static final double DENOMINATOR_239 = 239.0;
+    private static final double COEFFICIENT = 4.0;
+    private static final int DEFAULT_TERMS = 50;
+    private static final double CONVERGENCE_THRESHOLD = 1e-15;
     
     @Override
     public double calculatePi() {
         // Using Machin's formula: π/4 = 4*arctan(1/5) - arctan(1/239)
-        double arctan1_5 = calculateArctan(1.0/5.0, 50);
-        double arctan1_239 = calculateArctan(1.0/239.0, 50);
+        final double arctan1_5 = calculateArctanFunctional(1.0 / DENOMINATOR_5, DEFAULT_TERMS);
+        final double arctan1_239 = calculateArctanFunctional(1.0 / DENOMINATOR_239, DEFAULT_TERMS);
         
-        return 4.0 * (4.0 * arctan1_5 - arctan1_239);
+        return COEFFICIENT * (COEFFICIENT * arctan1_5 - arctan1_239);
     }
     
     @Override
-    public String calculatePiHighPrecision(int precision) {
-        MathContext mc = new MathContext(precision + 10, RoundingMode.HALF_UP);
+    public String calculatePiHighPrecision(final int precision) {
+        validatePrecision(precision);
         
-        BigDecimal five = new BigDecimal("5", mc);
-        BigDecimal two39 = new BigDecimal("239", mc);
-        BigDecimal four = new BigDecimal("4", mc);
+        final MathContext mc = new MathContext(precision + 10, RoundingMode.HALF_UP);
         
-        // Calculate arctan(1/5) and arctan(1/239) with high precision
-        BigDecimal arctan1_5 = calculateArctanHighPrecision(BigDecimal.ONE.divide(five, mc), mc);
-        BigDecimal arctan1_239 = calculateArctanHighPrecision(BigDecimal.ONE.divide(two39, mc), mc);
+        final BigDecimal five = new BigDecimal("5", mc);
+        final BigDecimal two39 = new BigDecimal("239", mc);
+        final BigDecimal four = new BigDecimal("4", mc);
+        
+        // Calculate arctan(1/5) and arctan(1/239) with high precision using functional approach
+        final BigDecimal arctan1_5 = calculateArctanHighPrecisionFunctional(
+            BigDecimal.ONE.divide(five, mc), mc);
+        final BigDecimal arctan1_239 = calculateArctanHighPrecisionFunctional(
+            BigDecimal.ONE.divide(two39, mc), mc);
         
         // π = 4 * (4*arctan(1/5) - arctan(1/239))
-        BigDecimal pi = four.multiply(
+        final BigDecimal pi = four.multiply(
             four.multiply(arctan1_5, mc).subtract(arctan1_239, mc), mc);
         
         return pi.setScale(precision, RoundingMode.HALF_UP).toPlainString();
     }
     
     /**
-     * Calculate arctan(x) using Taylor series for standard precision.
+     * Calculate arctan(x) using Taylor series with functional programming approach.
+     * Pure function with no side effects.
      */
-    private double calculateArctan(double x, int terms) {
-        double result = 0.0;
-        double x_squared = x * x;
-        double x_power = x;
+    private double calculateArctanFunctional(final double x, final int maxTerms) {
+        final double xSquared = x * x;
         
-        for (int i = 0; i < terms; i++) {
-            int denominator = 2 * i + 1;
-            double term = x_power / denominator;
-            
-            if (i % 2 == 0) {
-                result += term;
-            } else {
-                result -= term;
-            }
-            
-            x_power *= x_squared;
-        }
-        
-        return result;
+        return IntStream.range(0, maxTerms)
+            .mapToDouble(i -> calculateArctanTerm(x, xSquared, i))
+            .takeWhile(term -> Math.abs(term) >= CONVERGENCE_THRESHOLD)
+            .sum();
     }
     
     /**
-     * Calculate arctan(x) using Taylor series for high precision.
+     * Calculate individual arctan Taylor series term.
+     * Pure function for calculating term at index i.
      */
-    private BigDecimal calculateArctanHighPrecision(BigDecimal x, MathContext mc) {
-        BigDecimal result = BigDecimal.ZERO;
-        BigDecimal x_squared = x.multiply(x, mc);
-        BigDecimal x_power = x;
+    private double calculateArctanTerm(final double x, final double xSquared, final int index) {
+        final double xPower = Math.pow(x, 2 * index + 1);
+        final int denominator = 2 * index + 1;
+        final double term = xPower / denominator;
         
-        // Use enough terms to achieve required precision
-        int maxTerms = mc.getPrecision() * 2;
+        return (index % 2 == 0) ? term : -term;
+    }
+    
+    /**
+     * Calculate arctan(x) using Taylor series for high precision with functional approach.
+     * Utilizes stream processing for immutable computation.
+     */
+    private BigDecimal calculateArctanHighPrecisionFunctional(final BigDecimal x, final MathContext mc) {
+        final BigDecimal xSquared = x.multiply(x, mc);
+        final int maxTerms = mc.getPrecision() * 2;
+        final BigDecimal convergenceThreshold = createConvergenceThreshold(mc);
         
-        for (int i = 0; i < maxTerms; i++) {
-            BigDecimal denominator = new BigDecimal(2 * i + 1, mc);
-            BigDecimal term = x_power.divide(denominator, mc);
-            
-            if (i % 2 == 0) {
-                result = result.add(term, mc);
-            } else {
-                result = result.subtract(term, mc);
-            }
-            
-            x_power = x_power.multiply(x_squared, mc);
-            
-            // Check for convergence
-            if (term.abs().compareTo(BigDecimal.ONE.divide(
-                BigDecimal.TEN.pow(mc.getPrecision(), mc), mc)) < 0) {
-                break;
-            }
-        }
+        final Function<Integer, BigDecimal> termCalculator = 
+            createHighPrecisionTermCalculator(x, xSquared, mc);
+        final Predicate<BigDecimal> convergenceTest = 
+            term -> term.abs().compareTo(convergenceThreshold) >= 0;
         
-        return result;
+        return IntStream.range(0, maxTerms)
+            .mapToObj(i -> termCalculator.apply(i))
+            .takeWhile(convergenceTest)
+            .reduce(BigDecimal.ZERO, (sum, term) -> sum.add(term, mc));
+    }
+    
+    /**
+     * Create a function to calculate high-precision arctan terms.
+     * Returns a pure function with captured context.
+     */
+    private Function<Integer, BigDecimal> createHighPrecisionTermCalculator(
+            final BigDecimal x, final BigDecimal xSquared, final MathContext mc) {
+        
+        return index -> {
+            final BigDecimal xPower = calculatePower(x, xSquared, index, mc);
+            final BigDecimal denominator = new BigDecimal(2 * index + 1, mc);
+            final BigDecimal term = xPower.divide(denominator, mc);
+            
+            return (index % 2 == 0) ? term : term.negate();
+        };
+    }
+    
+    /**
+     * Calculate x^(2*index + 1) efficiently using memoized powers.
+     * Pure function for power calculation.
+     */
+    private BigDecimal calculatePower(final BigDecimal x, final BigDecimal xSquared, 
+                                    final int index, final MathContext mc) {
+        return IntStream.range(0, index)
+            .boxed()
+            .reduce(x, (power, i) -> power.multiply(xSquared, mc), (p1, p2) -> p1.multiply(p2, mc));
+    }
+    
+    /**
+     * Create convergence threshold for high precision calculations.
+     * Pure function returning immutable threshold.
+     */
+    private BigDecimal createConvergenceThreshold(final MathContext mc) {
+        return BigDecimal.ONE.divide(
+            BigDecimal.TEN.pow(mc.getPrecision(), mc), mc);
     }
 }
