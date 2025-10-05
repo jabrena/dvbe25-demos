@@ -2,6 +2,7 @@ package info.jab.churrera;
 
 import info.jab.cursor.CursorAgent;
 import info.jab.churrera.util.CursorApiKeyResolver;
+import info.jab.churrera.util.XmlResultDeserializer;
 import info.jab.churrera.agent.BaseAgent;
 import static info.jab.churrera.util.PmlConverter.toMarkdown;
 import static info.jab.churrera.util.ClasspathResolver.retrieve;

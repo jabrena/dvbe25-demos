@@ -21,7 +21,7 @@
 
     <safeguards>
         <safeguards-list>
-            <safeguards-item>verify the changes only with `./mvnw clean verify`</safeguards-item>
+            <safeguards-item>verify the changes only with `./mvnw clean verify -pl sandbox`</safeguards-item>
             <safeguards-item>if the verification is successful, then the goal is achieved</safeguards-item>
             <safeguards-item>and commit java sources only and push the changes to the branch to create the PR</safeguards-item>
         </safeguards-list>

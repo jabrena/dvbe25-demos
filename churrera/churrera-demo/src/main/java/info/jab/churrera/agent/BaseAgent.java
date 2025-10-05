@@ -7,6 +7,8 @@ import info.jab.churrera.util.ClasspathResolver;
 import info.jab.churrera.util.TimeAccumulated;
 import info.jab.churrera.util.CursorApiKeyResolver;
 import info.jab.churrera.util.PropertyResolver;
+import info.jab.cursor.client.model.ConversationMessage;
+import java.util.stream.Collectors;
 
 public abstract class BaseAgent {
 
@@ -46,6 +48,16 @@ public abstract class BaseAgent {
         System.out.println("✅ Cursor background agent updated successfully!");
 
         return monitorAgent(resultAgent);
+    }
+
+    protected String getAgentConversation(String agentId) {
+        try {
+            return cursorAgent.getAgentConversation(agentId).getMessages().stream()
+                .map(ConversationMessage::getText)
+                .collect(Collectors.joining("\n"));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get agent conversation", e);
+        }
     }
 
     /**

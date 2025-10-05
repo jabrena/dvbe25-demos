@@ -19,6 +19,12 @@ and not create any test class for this example</goal>
         <output-format-list>
             <output-format-item>not invest time in planning</output-format-item>
             <output-format-item>not explain anything</output-format-item>
+            <output-format-item>Replace in the following xml fragment the RESULT with the actual
+                result of the execution of the HelloWorld.java class
+                <![CDATA[
+                <result>RESULT</result>
+                ]]>
+            </output-format-item>
         </output-format-list>
     </output-format>
 

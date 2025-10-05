@@ -8,3 +8,4 @@ target/
 .classpath
 dependency-reduced-pom.xml
 .env
+local-m2/

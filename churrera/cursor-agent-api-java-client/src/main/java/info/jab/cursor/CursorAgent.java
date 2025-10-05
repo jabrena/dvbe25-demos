@@ -180,7 +180,7 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
      * @throws Exception if the operation fails
      */
     @Override
-    public AgentsList getAgents(Integer limit, String cursor) throws Exception {
+    public AgentsList getAgents(Integer limit, String cursor) {
         throw new UnsupportedOperationException("Method not implemented yet");
     }
 
@@ -279,7 +279,20 @@ public class CursorAgent implements CursorAgentManagement, CursorAgentInformatio
      * @throws Exception if the operation fails
      */
     @Override
-    public ConversationResponse getAgentConversation(String agentId) throws Exception {
-        throw new UnsupportedOperationException("Method not implemented yet");
+    public ConversationResponse getAgentConversation(String agentId) {
+        if (agentId == null || agentId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Agent ID cannot be null or empty");
+        }
+
+        // Prepare authentication headers
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Authorization", "Bearer " + apiKey);
+
+        try {
+            return agentInformationApi.getAgentConversation(agentId, headers);
+        } catch (Exception e) {
+            //info.jab.cursor.client.ApiException;
+            throw new RuntimeException(e);
+        }
     }
 }
