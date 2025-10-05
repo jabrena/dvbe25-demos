@@ -3,54 +3,67 @@ package info.jab.pi;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Pi calculator using Machin-like formula: π/4 = 4*arctan(1/5) - arctan(1/239)
+ * Implemented using functional programming principles with pure functions and immutable operations.
  */
-public class MachinLikePiCalculator implements HighPrecisionPiCalculator {
+public final class MachinLikePiCalculator implements HighPrecisionPiCalculator {
 
     @Override
     public BigDecimal calculatePiHighPrecision(int precision) {
-        MathContext mc = new MathContext(precision + 10, RoundingMode.HALF_UP);
+        final MathContext mc = new MathContext(precision + 10, RoundingMode.HALF_UP);
         
-        // Machin's formula: π/4 = 4*arctan(1/5) - arctan(1/239)
-        BigDecimal arctan1_5 = arctan(new BigDecimal("0.2"), mc);
-        BigDecimal arctan1_239 = arctan(BigDecimal.ONE.divide(new BigDecimal("239"), mc), mc);
+        // Pure functional approach to Machin's formula: π/4 = 4*arctan(1/5) - arctan(1/239)
+        final Function<BigDecimal, BigDecimal> arctanCalculator = x -> calculateArctan(x, mc);
         
-        BigDecimal piOver4 = arctan1_5.multiply(new BigDecimal("4"), mc)
+        final BigDecimal arctan1_5 = arctanCalculator.apply(new BigDecimal("0.2"));
+        final BigDecimal arctan1_239 = arctanCalculator.apply(BigDecimal.ONE.divide(new BigDecimal("239"), mc));
+        
+        final BigDecimal piOver4 = arctan1_5.multiply(new BigDecimal("4"), mc)
                 .subtract(arctan1_239, mc);
         
-        BigDecimal pi = piOver4.multiply(new BigDecimal("4"), mc);
-        
-        return pi.setScale(precision, RoundingMode.HALF_UP);
+        return piOver4.multiply(new BigDecimal("4"), mc)
+                .setScale(precision, RoundingMode.HALF_UP);
     }
     
     /**
-     * Calculate arctan using Taylor series expansion
+     * Pure function to calculate arctan using Taylor series expansion with functional composition
      */
-    private BigDecimal arctan(BigDecimal x, MathContext mc) {
-        BigDecimal result = BigDecimal.ZERO;
-        BigDecimal xPower = x;
-        BigDecimal xSquared = x.multiply(x, mc);
+    private BigDecimal calculateArctan(final BigDecimal x, final MathContext mc) {
+        final BigDecimal xSquared = x.multiply(x, mc);
+        final BigDecimal convergenceThreshold = new BigDecimal("1E-" + (mc.getPrecision() + 5));
         
-        for (int n = 0; n < 1000; n++) {
-            int denominator = 2 * n + 1;
-            BigDecimal term = xPower.divide(new BigDecimal(denominator), mc);
-            
-            if (n % 2 == 0) {
-                result = result.add(term, mc);
-            } else {
-                result = result.subtract(term, mc);
-            }
-            
-            xPower = xPower.multiply(xSquared, mc);
-            
-            // Check for convergence
-            if (term.abs().compareTo(new BigDecimal("1E-" + (mc.getPrecision() + 5))) < 0) {
-                break;
-            }
+        return calculateArctanTerms(x, xSquared, BigDecimal.ZERO, x, 0, mc, convergenceThreshold);
+    }
+    
+    /**
+     * Tail-recursive helper function for arctan calculation using trampoline pattern
+     */
+    private BigDecimal calculateArctanTerms(final BigDecimal x, final BigDecimal xSquared, 
+                                           final BigDecimal accumulator, final BigDecimal currentPower, 
+                                           final int n, final MathContext mc, 
+                                           final BigDecimal convergenceThreshold) {
+        if (n >= 1000) {
+            return accumulator;
         }
         
-        return result;
+        final int denominator = 2 * n + 1;
+        final BigDecimal term = currentPower.divide(new BigDecimal(denominator), mc);
+        
+        // Check for convergence
+        if (term.abs().compareTo(convergenceThreshold) < 0 && n > 0) {
+            return accumulator;
+        }
+        
+        final BigDecimal newAccumulator = (n % 2 == 0) 
+            ? accumulator.add(term, mc) 
+            : accumulator.subtract(term, mc);
+        
+        final BigDecimal nextPower = currentPower.multiply(xSquared, mc);
+        
+        return calculateArctanTerms(x, xSquared, newAccumulator, nextPower, n + 1, mc, convergenceThreshold);
     }
 }
