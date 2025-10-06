@@ -38,7 +38,7 @@
         <assertj-core.version>3.26.3</assertj-core.version>
 
         <!-- Additional dependencies for churrera modules -->
-        <swagger.version>2.2.37</swagger.version>
+        <swagger.version>2.2.38</swagger.version>
         <jakarta.annotation.version>3.0.0</jakarta.annotation.version>
         <wiremock.version>3.13.1</wiremock.version>
 
