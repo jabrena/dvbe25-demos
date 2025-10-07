@@ -3,6 +3,7 @@ package info.jab.pi;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.stream.IntStream;
 
 /**
 * Implementation of Pi calculation using the Chudnovsky algorithm.
@@ -10,67 +11,63 @@ import java.math.RoundingMode;
 */
 public class ChudnovskyPiCalculator implements HighPrecisionPiCalculator {
 
+    private static final BigDecimal TWELVE = new BigDecimal("12");
+    private static final BigDecimal BASE_640320 = new BigDecimal("640320");
+    private static final BigDecimal LINEAR_COEFFICIENT_1 = new BigDecimal("13591409");
+    private static final BigDecimal LINEAR_COEFFICIENT_2 = new BigDecimal("545140134");
+
     @Override
     public BigDecimal calculatePiHighPrecision(int precision) {
         MathContext mc = new MathContext(precision + 20, RoundingMode.HALF_UP);
+        int terms = Math.max(20, precision / 10);
         
-        BigDecimal sum = BigDecimal.ZERO;
-        BigDecimal sign = BigDecimal.ONE;
+        BigDecimal sum = IntStream.range(0, terms)
+            .mapToObj(k -> calculateChudnovskyTerm(k, mc))
+            .reduce(BigDecimal.ZERO, (acc, term) -> {
+                BigDecimal sign = new BigDecimal(acc.equals(BigDecimal.ZERO) ? 1 : -1);
+                return acc.add(term.multiply(sign, mc), mc);
+            });
         
-        // Calculate the number of terms needed for the desired precision
-        int terms = Math.max(20, precision / 10); // More terms for better precision
-        
-        for (int k = 0; k < terms; k++) {
-            BigDecimal term = calculateTerm(k, mc);
-            sum = sum.add(term.multiply(sign, mc), mc);
-            sign = sign.negate();
-        }
-        
-        // Calculate 1/π
-        BigDecimal oneOverPi = sum.multiply(new BigDecimal("12"), mc);
-        
-        // Calculate π = 1 / (1/π)
-        BigDecimal pi = BigDecimal.ONE.divide(oneOverPi, mc);
-        
-        return pi.setScale(precision, RoundingMode.HALF_UP);
+        return BigDecimal.ONE.divide(sum.multiply(TWELVE, mc), mc)
+            .setScale(precision, RoundingMode.HALF_UP);
     }
     
     /**
      * Calculate a single term of the Chudnovsky series
      */
-    private BigDecimal calculateTerm(int k, MathContext mc) {
-        // (6k)! / ((3k)! * (k!)^3)
-        BigDecimal numerator = factorial(6 * k, mc);
-        BigDecimal denominator = factorial(3 * k, mc).multiply(
-            factorial(k, mc).pow(3, mc), mc);
+    private BigDecimal calculateChudnovskyTerm(int k, MathContext mc) {
+        BigDecimal factorialRatio = calculateFactorialRatio(k, mc);
+        BigDecimal linearTerm = calculateLinearTerm(k, mc);
+        BigDecimal powerTerm = calculatePowerTerm(k, mc);
         
-        BigDecimal fraction = numerator.divide(denominator, mc);
-        
-        // (13591409 + 545140134*k)
-        BigDecimal linearTerm = new BigDecimal("13591409")
-            .add(new BigDecimal("545140134").multiply(new BigDecimal(k), mc), mc);
-        
-        // 640320^(3k + 3/2) = 640320^(3k) * 640320^(3/2)
-        BigDecimal base640320 = new BigDecimal("640320");
-        BigDecimal power3k = base640320.pow(3 * k, mc);
-        BigDecimal power3_2 = base640320.pow(3, mc).sqrt(mc); // 640320^(3/2)
-        BigDecimal powerTerm = power3k.multiply(power3_2, mc);
-        
-        return fraction.multiply(linearTerm, mc).divide(powerTerm, mc);
+        return factorialRatio.multiply(linearTerm, mc).divide(powerTerm, mc);
+    }
+    
+    private BigDecimal calculateFactorialRatio(int k, MathContext mc) {
+        return factorial(6 * k, mc)
+            .divide(factorial(3 * k, mc).multiply(factorial(k, mc).pow(3, mc), mc), mc);
+    }
+    
+    private BigDecimal calculateLinearTerm(int k, MathContext mc) {
+        return LINEAR_COEFFICIENT_1.add(LINEAR_COEFFICIENT_2.multiply(new BigDecimal(k), mc), mc);
+    }
+    
+    private BigDecimal calculatePowerTerm(int k, MathContext mc) {
+        BigDecimal power3k = BASE_640320.pow(3 * k, mc);
+        BigDecimal power3_2 = BASE_640320.pow(3, mc).sqrt(mc);
+        return power3k.multiply(power3_2, mc);
     }
     
     /**
-     * Calculate factorial of n
+     * Calculate factorial of n using functional approach
      */
     private BigDecimal factorial(int n, MathContext mc) {
         if (n <= 1) {
             return BigDecimal.ONE;
         }
         
-        BigDecimal result = BigDecimal.ONE;
-        for (int i = 2; i <= n; i++) {
-            result = result.multiply(new BigDecimal(i), mc);
-        }
-        return result;
+        return IntStream.rangeClosed(2, n)
+            .mapToObj(i -> new BigDecimal(i))
+            .reduce(BigDecimal.ONE, (acc, val) -> acc.multiply(val, mc));
     }
 }
