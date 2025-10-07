@@ -1,0 +1,62 @@
+[
+  {
+    "number": 1,
+    "title": "Homework 1",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/01-intro.pdf"
+  },
+  {
+    "number": 2,
+    "title": "Homework 2",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/02-ADTs.pdf"
+  },
+  {
+    "number": 3,
+    "title": "Homework 3",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/03-rec-poly.pdf"
+  },
+  {
+    "number": 4,
+    "title": "Homework 4",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/04-higher-order.pdf"
+  },
+  {
+    "number": 5,
+    "title": "Homework 5",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/05-type-classes.pdf"
+  },
+  {
+    "number": 6,
+    "title": "Homework 6",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/06-laziness.pdf"
+  },
+  {
+    "number": 7,
+    "title": "Homework 7",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/07-folds-monoids.pdf"
+  },
+  {
+    "number": 8,
+    "title": "Homework 8",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/08-IO.pdf"
+  },
+  {
+    "number": 9,
+    "title": "Homework 9",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/09-functors.pdf"
+  },
+  {
+    "number": 10,
+    "title": "Homework 10",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/10-applicative.pdf"
+  },
+  {
+    "number": 11,
+    "title": "Homework 11",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/11-applicative2.pdf"
+  },
+  {
+    "number": 12,
+    "title": "Homework 12",
+    "pdfUrl": "https://www.cis.upenn.edu/~cis1940/spring13/hw/12-monads.pdf"
+  }
+]
