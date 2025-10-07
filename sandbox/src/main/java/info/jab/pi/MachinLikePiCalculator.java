@@ -3,6 +3,8 @@ package info.jab.pi;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.stream.IntStream;
+import java.util.function.Function;
 
 /**
 * Implementation of Pi calculation using Machin-like formulas.
@@ -10,27 +12,32 @@ import java.math.RoundingMode;
 */
 public class MachinLikePiCalculator implements HighPrecisionPiCalculator {
 
+    private static final BigDecimal FIVE = BigDecimal.valueOf(5);
+    private static final BigDecimal TWO_HUNDRED_THIRTY_NINE = BigDecimal.valueOf(239);
+    private static final BigDecimal FOUR = BigDecimal.valueOf(4);
+
     @Override
     public BigDecimal calculatePiHighPrecision(int precision) {
-        MathContext mc = new MathContext(precision + 10, RoundingMode.HALF_UP);
-        
-        // Calculate arctan(1/5) using Taylor series
-        BigDecimal arctan5 = calculateArctan(BigDecimal.ONE.divide(BigDecimal.valueOf(5), mc), precision + 10);
-        
-        // Calculate arctan(1/239) using Taylor series
-        BigDecimal arctan239 = calculateArctan(BigDecimal.ONE.divide(BigDecimal.valueOf(239), mc), precision + 10);
-        
-        // Apply Machin's formula: π/4 = 4*arctan(1/5) - arctan(1/239)
-        BigDecimal piOver4 = arctan5.multiply(BigDecimal.valueOf(4), mc).subtract(arctan239, mc);
-        
-        // Multiply by 4 to get π
-        BigDecimal pi = piOver4.multiply(BigDecimal.valueOf(4), mc);
-        
-        return pi.setScale(precision, RoundingMode.HALF_UP);
+        MathContext mc = createMathContext.apply(precision);
+        return calculateMachinFormula(mc, precision);
     }
-    
+
+    private Function<Integer, MathContext> createMathContext = 
+            precision -> new MathContext(precision + 10, RoundingMode.HALF_UP);
+
+    private BigDecimal calculateMachinFormula(MathContext mc, int precision) {
+        BigDecimal arctan5 = calculateArctan(BigDecimal.ONE.divide(FIVE, mc), precision);
+        BigDecimal arctan239 = calculateArctan(BigDecimal.ONE.divide(TWO_HUNDRED_THIRTY_NINE, mc), precision);
+        
+        return arctan5.multiply(FOUR, mc)
+                .subtract(arctan239, mc)
+                .multiply(FOUR, mc)
+                .setScale(precision, RoundingMode.HALF_UP);
+    }
+
     /**
      * Calculate arctan(x) using Taylor series: arctan(x) = x - x³/3 + x⁵/5 - x⁷/7 + ...
+     * Uses functional approach with streams for convergence
      */
     private BigDecimal calculateArctan(BigDecimal x, int precision) {
         MathContext mc = new MathContext(precision + 10, RoundingMode.HALF_UP);
